@@ -25,13 +25,13 @@ class User extends Authenticatable
     public const ROLE_ADMIN = 'admin';
 
     public const ROLES = [
-        self::ROLE_ETUDIANT => 'Etudiant',
+        self::ROLE_ETUDIANT => 'Étudiant',
         self::ROLE_CP => 'Chef de promotion',
         self::ROLE_CPA => 'Chef de promotion adjoint',
         self::ROLE_ENSEIGNANT => 'Enseignant',
-        self::ROLE_DF => 'Doyen de faculte',
-        self::ROLE_DFA => 'Doyen de faculte adjoint',
-        self::ROLE_VDE => 'Vice-recteur charge de l\'enseignement',
+        self::ROLE_DF => 'Doyen de faculté',
+        self::ROLE_DFA => 'Doyen de faculté adjoint',
+        self::ROLE_VDE => 'Vice-recteur chargé de l\'enseignement',
         self::ROLE_ADMIN => 'Administrateur',
     ];
 
@@ -113,7 +113,7 @@ class User extends Authenticatable
         return $this->hasAnyRole([self::ROLE_DF, self::ROLE_DFA]);
     }
 
-    /** Le VDE et l'administrateur voient toute l'universite. */
+    /** Le VDE et l'administrateur voient toute l'université. */
     public function aPorteeUniversitaire(): bool
     {
         return $this->hasAnyRole([self::ROLE_VDE, self::ROLE_ADMIN]);

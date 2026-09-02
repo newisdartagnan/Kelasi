@@ -5,9 +5,9 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * L'utilisateur, rattache a l'ossature academique.
+ * L'utilisateur, rattache a l'ossature académique.
  *
- * Le rattachement determine la portee : un DF voit sa faculte, un CP sa
+ * Le rattachement determine la portee : un DF voit sa faculté, un CP sa
  * promotion, un enseignant ses cours attribues. Les roles eux-memes sont
  * geres par spatie/laravel-permission.
  *

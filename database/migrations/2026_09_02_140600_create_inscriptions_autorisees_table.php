@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\Schema;
  * Le verrou d'entree.
  *
  * Le cahier des charges d'origine prevoyait une inscription libre. Dans une
- * universite, cela signifie que n'importe qui peut se declarer etudiant d'une
+ * université, cela signifie que n'importe qui peut se declarer étudiant d'une
  * promotion -- et l'avancement des cours perd toute valeur probante.
  *
  * Ici, l'inscription est adossee a une liste de matricules deposee par le
- * secretariat academique. On ne cree pas un compte : on active une ligne qui
- * existe deja.
+ * secrétariat académique. On ne cree pas un compte : on active une ligne qui
+ * existe déjà.
  */
 return new class extends Migration
 {

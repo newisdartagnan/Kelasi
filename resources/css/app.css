@@ -6,6 +6,46 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+    /* Bleu profond de l'enseignement superieur congolais, decline en gamme. */
+    --color-kelasi-50: oklch(0.97 0.015 250);
+    --color-kelasi-100: oklch(0.93 0.035 250);
+    --color-kelasi-200: oklch(0.86 0.06 250);
+    --color-kelasi-400: oklch(0.65 0.13 250);
+    --color-kelasi-500: oklch(0.55 0.15 250);
+    --color-kelasi-600: oklch(0.47 0.15 250);
+    --color-kelasi-700: oklch(0.39 0.13 250);
+    --color-kelasi-900: oklch(0.25 0.08 250);
+}
+
+/* Les jauges d'avancement : une seule règle de forme pour toute l'application.
+   La jauge n'est pas rognée : le repère du calendrier doit pouvoir déborder
+   au-dessus et au-dessous, sinon il se confond avec la barre. */
+@layer components {
+    .jauge {
+        @apply relative h-2.5 w-full rounded-full bg-slate-200;
+    }
+
+    .jauge-valeur {
+        @apply h-full rounded-full transition-[width] duration-500;
+    }
+
+    /* Ce qui est saisi mais pas encore contresigné : hachures, pour qu'on ne
+       le confonde jamais avec de l'acquis. */
+    .jauge-en-attente {
+        @apply absolute inset-y-0;
+        background-image: repeating-linear-gradient(
+            -45deg,
+            var(--color-slate-400) 0 2px,
+            transparent 2px 5px
+        );
+    }
+
+    /* Le repère du calendrier : là où l'avancement devrait être arrivé. */
+    .jauge-repere {
+        @apply absolute w-0.5 -translate-x-1/2 rounded-full bg-slate-900;
+        top: -3px;
+        bottom: -3px;
+    }
 }

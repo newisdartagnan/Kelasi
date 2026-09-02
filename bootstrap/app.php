@@ -11,7 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // L'application parle francais jusque dans ses URL : un visiteur non
+        // connecte arrive sur /connexion, pas sur /login.
+        $middleware->redirectGuestsTo('/connexion');
+        $middleware->redirectUsersTo('/');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

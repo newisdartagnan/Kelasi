@@ -14,7 +14,7 @@ use App\Support\VolumeHoraire;
 use Database\Seeders\RolesEtPermissionsSeeder;
 
 /**
- * Le decor minimal d'un test : une faculte, une promotion, un cours, un chef
+ * Le decor minimal d'un test : une faculté, une promotion, un cours, un chef
  * de promotion et l'enseignant qui lui est attribue.
  */
 trait ConstruitUnContexteAcademique
@@ -44,14 +44,14 @@ trait ConstruitUnContexteAcademique
         ]);
 
         $this->faculte = Faculte::create([
-            'nom' => 'Faculte de Droit',
+            'nom' => 'Faculté de Droit',
             'sigle' => 'DROIT',
             'slug' => 'faculte-de-droit',
         ]);
 
         $departement = Departement::create([
             'faculte_id' => $this->faculte->id,
-            'nom' => 'Droit prive et judiciaire',
+            'nom' => 'Droit privé et judiciaire',
             'sigle' => 'DPJ',
         ]);
 
@@ -59,7 +59,7 @@ trait ConstruitUnContexteAcademique
             'departement_id' => $departement->id,
             'annee_academique_id' => $this->annee->id,
             'niveau' => 'L1',
-            'intitule' => 'Premiere annee de licence en droit',
+            'intitule' => 'Première année de licence en droit',
             'active' => true,
         ]);
 
@@ -76,7 +76,7 @@ trait ConstruitUnContexteAcademique
         $this->cours = Cours::create([
             'unite_enseignement_id' => $ue->id,
             'code' => 'DRT101',
-            'intitule' => 'Introduction generale a l\'etude du droit',
+            'intitule' => 'Introduction générale a l\'étude du droit',
             'credits' => 6,
             'heures_cmi' => $volume['cmi'],
             'heures_td' => $volume['td'],

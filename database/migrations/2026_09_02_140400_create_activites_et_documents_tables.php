@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Schema;
  * visites guidees, conferences) et les documents partages par les enseignants.
  *
  * Une activite a une portee : elle vise une promotion, un departement, une
- * faculte ou toute l'universite. C'est la portee, et non le createur, qui
+ * faculté ou toute l'université. C'est la portee, et non le createur, qui
  * determine qui la voit.
  */
 return new class extends Migration
@@ -20,9 +20,9 @@ return new class extends Migration
             $table->id();
             $table->string('titre');
             $table->text('description')->nullable();
-            $table->string('type', 30);          // examen|interrogation|visite|conference|deliberation|autre
+            $table->string('type', 30);          // examen|interrogation|visite|conférence|délibération|autre
 
-            $table->string('portee', 20);        // promotion|departement|faculte|universite
+            $table->string('portee', 20);        // promotion|departement|faculté|université
             $table->foreignId('promotion_id')->nullable()->constrained('promotions')->cascadeOnDelete();
             $table->foreignId('departement_id')->nullable()->constrained('departements')->cascadeOnDelete();
             $table->foreignId('faculte_id')->nullable()->constrained('facultes')->cascadeOnDelete();
@@ -32,7 +32,7 @@ return new class extends Migration
             $table->dateTime('debut');
             $table->dateTime('fin')->nullable();
 
-            $table->string('statut', 20)->default('planifiee'); // planifiee|en_cours|cloturee|annulee
+            $table->string('statut', 20)->default('planifiee'); // planifiee|en_cours|cloturee|annulée
             $table->foreignId('createur_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
 

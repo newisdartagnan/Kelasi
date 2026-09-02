@@ -16,11 +16,11 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
- * Un jeu de demonstration : des comptes pour chaque role et un semestre deja
+ * Un jeu de demonstration : des comptes pour chaque role et un semestre déjà
  * entame, pour qu'on puisse ouvrir l'application et voir quelque chose.
  *
  * Les seances sont generees avec un avancement volontairement inegal d'un
- * cours a l'autre. C'est la situation reelle qu'un doyen veut reperer d'un
+ * cours a l'autre. C'est la situation réelle qu'un doyen veut reperer d'un
  * coup d'oeil : le cours qui a pris trois semaines de retard pendant que les
  * autres avancaient.
  */
@@ -56,14 +56,14 @@ class DemonstrationSeeder extends Seeder
     /**
      * Le calendrier congolais court de la mi-octobre a fin juillet. Executee
      * en aout ou en septembre, la demonstration tomberait dans le creux entre
-     * deux annees : rien a montrer, et un taux attendu de 100 %.
+     * deux années : rien a montrer, et un taux attendu de 100 %.
      *
      * On fait donc glisser la fenetre pour que le jour de la demonstration se
-     * situe aux trois cinquiemes de l'annee -- le moment ou l'ecart entre les
+     * situe aux trois cinquiemes de l'année -- le moment ou l'écart entre les
      * cours a jour et ceux qui decrochent est le plus lisible.
      *
      * Ajustement propre a la demonstration : en production, ces dates sont
-     * saisies par le secretariat academique.
+     * saisies par le secrétariat académique.
      */
     private function cadrerAnneePourLaDemonstration(AnneeAcademique $annee): AnneeAcademique
     {
@@ -182,7 +182,7 @@ class DemonstrationSeeder extends Seeder
                 $duree = 120;
                 $type = $this->typeDeSeance($unCours, $minutesFaites);
 
-                // Les deux dernieres seances restent en attente de contreseing,
+                // Les deux dernières seances restent en attente de contreseing,
                 // pour que la file de validation de l'enseignant ne soit pas vide.
                 $reste = $minutesACouvrir - $minutesFaites;
                 $enAttente = $reste <= $duree * 2;

@@ -57,7 +57,7 @@ class RegistreDesSeancesTest extends TestCase
             'departement_id' => $this->promotion->departement_id,
             'annee_academique_id' => $this->annee->id,
             'niveau' => 'L2',
-            'intitule' => 'Deuxieme annee de licence en droit',
+            'intitule' => 'Deuxième année de licence en droit',
             'active' => true,
         ]);
 
@@ -145,7 +145,7 @@ class RegistreDesSeancesTest extends TestCase
     public function test_une_seance_contestee_sort_de_l_avancement(): void
     {
         $seance = $this->registre->saisir($this->chef, $this->cours, $this->donneesSeance());
-        $this->registre->contester($this->enseignant, $seance, 'Le chapitre annonce n\'a pas ete traite.');
+        $this->registre->contester($this->enseignant, $seance, 'Le chapitre annonce n\'a pas ete traité.');
 
         $avancement = app(CalculateurAvancement::class)->pourCours($this->cours->fresh());
 

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * Un element constitutif d'une unite d'enseignement -- ce que tout le monde
+ * Un élément constitutif d'une unite d'enseignement -- ce que tout le monde
  * appelle simplement "le cours".
  */
 class Cours extends Model

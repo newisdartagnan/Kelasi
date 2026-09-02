@@ -5,9 +5,9 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Messagerie interne, cadree par la hierarchie academique.
+ * Messagerie interne, cadree par la hierarchie académique.
  *
- * Une conversation est rattachee a un contexte (une promotion, un cours) ou
+ * Une conversation est rattachée a un contexte (une promotion, un cours) ou
  * bien directe entre deux personnes. Le cadrage des interlocuteurs autorises
  * se fait dans les policies, pas dans le schema.
  */
@@ -18,7 +18,7 @@ return new class extends Migration
         Schema::create('conversations', function (Blueprint $table) {
             $table->id();
             $table->string('sujet')->nullable();
-            $table->string('type', 20)->default('directe'); // directe|promotion|cours|faculte
+            $table->string('type', 20)->default('directe'); // directe|promotion|cours|faculté
             $table->foreignId('promotion_id')->nullable()->constrained('promotions')->cascadeOnDelete();
             $table->foreignId('cours_id')->nullable()->constrained('cours')->cascadeOnDelete();
             $table->foreignId('createur_id')->constrained('users')->cascadeOnDelete();

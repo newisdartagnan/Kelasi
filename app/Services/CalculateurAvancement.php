@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Repond a la question que toute l'application existe pour resoudre :
- * ou en est reellement le cours X, et de combien est-il en retard ?
+ * ou en est réellement le cours X, et de combien est-il en retard ?
  *
  * Tous les calculs acceptent un semestre. Sans lui, on melangerait un premier
  * semestre acheve avec un second a peine commence, et le taux consolide ne
@@ -62,7 +62,7 @@ class CalculateurAvancement
     }
 
     /**
-     * Avancement de chaque promotion d'une faculte, indexe par identifiant de
+     * Avancement de chaque promotion d'une faculté, indexe par identifiant de
      * promotion.
      *
      * @return Collection<int, Avancement>
@@ -111,14 +111,14 @@ class CalculateurAvancement
         });
     }
 
-    /** Avancement consolide d'une faculte. */
+    /** Avancement consolide d'une faculté. */
     public function pourFaculte(Faculte $faculte, ?AnneeAcademique $annee = null, ?int $semestre = null): Avancement
     {
         return $this->consolider($this->parPromotionDeFaculte($faculte, $annee, $semestre));
     }
 
     /**
-     * Part de la periode ecoulee, en pourcentage. Sert de reference pour dire
+     * Part de la periode écoulée, en pourcentage. Sert de reference pour dire
      * si un enseignement est en avance ou en retard : a la mi-parcours, on
      * attend la moitie du volume.
      */
@@ -176,7 +176,7 @@ class CalculateurAvancement
     }
 
     /**
-     * Les seances qui comptent : celles d'enseignement, saisies ou validees.
+     * Les seances qui comptent : celles d'enseignement, saisies ou validées.
      * Le filtre par semestre passe par l'unite d'enseignement du cours.
      */
     private function requeteSeances(?int $semestre): \Illuminate\Database\Query\Builder

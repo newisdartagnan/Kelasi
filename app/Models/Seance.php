@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 
 /**
- * Une seance reellement tenue.
+ * Une seance réellement tenue.
  *
- * Elle n'entre dans l'avancement qu'une fois validee par l'enseignant. Tout
+ * Elle n'entre dans l'avancement qu'une fois validée par l'enseignant. Tout
  * le reste de l'application -- tableaux de bord, exports, alertes de retard --
  * se lit a travers ce filtre.
  */
@@ -35,7 +35,7 @@ class Seance extends Model
 
     public const TYPES = [
         self::TYPE_CMI => 'Cours magistral',
-        self::TYPE_TD => 'Travaux diriges',
+        self::TYPE_TD => 'Travaux dirigés',
         self::TYPE_TP => 'Travaux pratiques',
         self::TYPE_EXAMEN => 'Examen',
         self::TYPE_INTERROGATION => 'Interrogation',

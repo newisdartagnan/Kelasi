@@ -5,10 +5,10 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Referentiel academique : l'ossature institutionnelle.
+ * Referentiel académique : l'ossature institutionnelle.
  *
- * Une faculte contient des departements, un departement accueille une promotion
- * par annee academique. Tout le reste (programme, seances, activites) pend a
+ * Une faculté contient des departements, un departement accueille une promotion
+ * par année académique. Tout le reste (programme, seances, activites) pend a
  * cette ossature.
  */
 return new class extends Migration
@@ -53,7 +53,7 @@ return new class extends Migration
             $table->foreignId('departement_id')->constrained('departements')->cascadeOnDelete();
             $table->foreignId('annee_academique_id')->constrained('annees_academiques')->cascadeOnDelete();
             $table->string('niveau', 10);              // L1 L2 L3 M1 M2
-            $table->string('intitule');                // "L1 Droit prive et judiciaire"
+            $table->string('intitule');                // "L1 Droit privé et judiciaire"
             $table->unsignedInteger('effectif_attendu')->default(0);
             $table->boolean('active')->default(true);
             $table->timestamps();

@@ -15,8 +15,8 @@ use Illuminate\Database\Seeder;
  * Charge les maquettes decrites dans database/data/programmes.php.
  *
  * Les volumes horaires ne sont pas stockes dans le fichier de donnees : ils
- * se deduisent des credits. Une maquette se corrige donc en changeant un
- * nombre de credits, jamais en recalculant des heures a la main.
+ * se deduisent des crédits. Une maquette se corrige donc en changeant un
+ * nombre de crédits, jamais en recalculant des heures a la main.
  */
 class ProgrammeSeeder extends Seeder
 {
@@ -25,7 +25,7 @@ class ProgrammeSeeder extends Seeder
         $annee = AnneeAcademique::courante();
 
         if (! $annee) {
-            $this->command?->warn('Aucune annee academique active : programmes non charges.');
+            $this->command?->warn('Aucune année académique active : programmes non charges.');
 
             return;
         }

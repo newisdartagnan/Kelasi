@@ -3,12 +3,12 @@
 namespace App\Support;
 
 /**
- * La conversion credits -> heures, telle que la fixent les instructions
- * academiques du MINESU pour le systeme LMD.
+ * La conversion crédits -> heures, telle que la fixent les instructions
+ * académiques du MINESU pour le système LMD.
  *
- * Un credit represente 25 heures de travail etudiant, reparties selon un
+ * Un crédit represente 25 heures de travail étudiant, reparties selon un
  * standard de deux tiers d'heures encadrees pour un tiers de travail
- * personnel. Un semestre vaut 30 credits, une annee 60, une licence 180.
+ * personnel. Un semestre vaut 30 crédits, une année 60, une licence 180.
  *
  * Les maquettes ministerielles ne publient que les heures encadrees : ce sont
  * elles qui se deroulent en salle, et donc les seules que les seances
@@ -16,16 +16,16 @@ namespace App\Support;
  */
 final class VolumeHoraire
 {
-    /** Heures de travail etudiant pour un credit. */
+    /** Heures de travail étudiant pour un crédit. */
     public const HEURES_PAR_CREDIT = 25;
 
-    /** Part encadree du travail etudiant. Le reste est du TPE. */
+    /** Part encadree du travail étudiant. Le reste est du TPE. */
     public const PART_ENCADREE = 2 / 3;
 
     public const CREDITS_PAR_SEMESTRE = 30;
     public const CREDITS_PAR_ANNEE = 60;
 
-    /** Heures encadrees correspondant a un nombre de credits. */
+    /** Heures encadrees correspondant a un nombre de crédits. */
     public static function heuresEncadrees(int $credits): int
     {
         return (int) round($credits * self::HEURES_PAR_CREDIT * self::PART_ENCADREE);

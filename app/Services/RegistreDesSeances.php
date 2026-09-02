@@ -65,7 +65,7 @@ class RegistreDesSeances
 
         if ($seance->statut !== Seance::STATUT_SOUMISE) {
             throw ValidationException::withMessages([
-                'seance' => 'Seule une seance soumise peut etre validee.',
+                'seance' => 'Seule une séance soumise peut être validée.',
             ]);
         }
 
@@ -89,7 +89,7 @@ class RegistreDesSeances
 
         if ($seance->statut !== Seance::STATUT_SOUMISE) {
             throw ValidationException::withMessages([
-                'seance' => 'Seule une seance soumise peut etre contestee.',
+                'seance' => 'Seule une séance soumise peut être contestée.',
             ]);
         }
 
@@ -106,7 +106,7 @@ class RegistreDesSeances
     /**
      * Synchronise un lot de seances saisies hors ligne.
      *
-     * L'uuid vient de l'appareil : une seance deja connue est ignoree plutot
+     * L'uuid vient de l'appareil : une seance déjà connue est ignoree plutot
      * que dupliquee. C'est ce qui rend la synchronisation rejouable -- un CP
      * dont la connexion coupe en plein envoi peut relancer sans crainte.
      *
@@ -142,7 +142,7 @@ class RegistreDesSeances
             } catch (\Throwable $e) {
                 $resultat['refusees'][$uuid] = $e instanceof ValidationException
                     ? collect($e->errors())->flatten()->first()
-                    : 'Seance refusee.';
+                    : 'Séance refusée.';
             }
         }
 
@@ -154,7 +154,7 @@ class RegistreDesSeances
     {
         if (! $auteur->estChefDePromotion()) {
             throw ValidationException::withMessages([
-                'seance' => 'Seul un chef de promotion peut saisir une seance.',
+                'seance' => 'Seul un chef de promotion peut saisir une séance.',
             ]);
         }
 
@@ -184,7 +184,7 @@ class RegistreDesSeances
 
         if ($enseignant->id === $seance->saisie_par_id) {
             throw ValidationException::withMessages([
-                'seance' => 'La personne qui a saisi la seance ne peut pas la valider.',
+                'seance' => 'La personne qui a saisi la séance ne peut pas la valider.',
             ]);
         }
     }
@@ -194,13 +194,13 @@ class RegistreDesSeances
     {
         if (Carbon::parse($date)->startOfDay()->isFuture()) {
             throw ValidationException::withMessages([
-                'date_seance' => 'On ne saisit pas une seance qui ne s\'est pas encore tenue.',
+                'date_seance' => 'On ne saisit pas une séance qui ne s\'est pas encore tenue.',
             ]);
         }
 
         if ($this->dureeEnMinutes($debut, $fin) <= 0) {
             throw ValidationException::withMessages([
-                'heure_fin' => 'L\'heure de fin doit suivre l\'heure de debut.',
+                'heure_fin' => 'L\'heure de fin doit suivre l\'heure de début.',
             ]);
         }
     }

@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\Schema;
  * Le programme des cours, au format LMD tel qu'applique en RDC.
  *
  * Une promotion suit des unites d'enseignement (UE) reparties sur deux
- * semestres de 30 credits chacun. Chaque UE se decompose en elements
+ * semestres de 30 crédits chacun. Chaque UE se decompose en éléments
  * constitutifs -- les cours proprement dits -- dont le volume horaire est
  * ventile en CMI (cours magistral interactif), TD, TP et TPE (travail
- * personnel de l'etudiant).
+ * personnel de l'étudiant).
  *
- * Regle ministerielle retenue : 1 credit = 25 heures de travail etudiant,
+ * Regle ministerielle retenue : 1 crédit = 25 heures de travail étudiant,
  * dont environ deux tiers d'heures encadrees et un tiers de TPE. Seules les
  * heures encadrees se deroulent en salle -- ce sont elles que les seances
  * viennent consommer.

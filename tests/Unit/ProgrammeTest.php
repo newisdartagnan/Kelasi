@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Les maquettes livrees avec l'application doivent respecter la regle
- * ministerielle : trente credits par semestre, ni plus ni moins.
+ * ministerielle : trente crédits par semestre, ni plus ni moins.
  *
  * Une maquette qui ne tombe pas juste est un bug, pas une approximation.
  */
@@ -46,7 +46,7 @@ class ProgrammeTest extends TestCase
             $this->assertSame(
                 30,
                 $credits,
-                "{$faculte} {$departement} {$niveau}, semestre {$semestre} : {$credits} credits au lieu de 30.",
+                "{$faculte} {$departement} {$niveau}, semestre {$semestre} : {$credits} crédits au lieu de 30.",
             );
         }
     }
@@ -64,7 +64,7 @@ class ProgrammeTest extends TestCase
             $this->assertSame(
                 $ue['credits'],
                 $somme,
-                "{$faculte} {$departement} {$niveau}, {$ue['code']} : les cours totalisent {$somme} credits pour une UE annoncee a {$ue['credits']}.",
+                "{$faculte} {$departement} {$niveau}, {$ue['code']} : les cours totalisent {$somme} crédits pour une UE annoncee a {$ue['credits']}.",
             );
         }
     }

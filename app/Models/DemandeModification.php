@@ -20,9 +20,9 @@ class DemandeModification extends Model
 
     public const TYPES = [
         'volume' => 'Volume horaire',
-        'intitule' => 'Intitule du cours',
-        'repartition' => 'Repartition CMI / TD / TP',
-        'report' => 'Report de seances',
+        'intitule' => 'Intitulé du cours',
+        'repartition' => 'Répartition CMI / TD / TP',
+        'report' => 'Report de séances',
         'autre' => 'Autre',
     ];
 

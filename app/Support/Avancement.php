@@ -4,10 +4,10 @@ namespace App\Support;
 
 /**
  * L'avancement d'un enseignement : ce qui etait prevu, ce qui a ete
- * effectivement tenu et contresigne, et l'ecart entre les deux.
+ * effectivement tenu et contresigne, et l'écart entre les deux.
  *
- * Les heures realisees ne comptent que les seances validees par l'enseignant.
- * Une seance saisie mais non contresignee est du declaratif : elle apparait
+ * Les heures realisees ne comptent que les seances validées par l'enseignant.
+ * Une seance saisie mais non contresignée est du declaratif : elle apparait
  * ailleurs, en attente, jamais dans ce chiffre.
  */
 readonly class Avancement
@@ -54,7 +54,7 @@ readonly class Avancement
     }
 
     /**
-     * Le taux reel, non plafonne. Un cours a 118 % signale un depassement de
+     * Le taux réel, non plafonne. Un cours a 118 % signale un depassement de
      * volume -- une information que le plafonnement effacerait.
      */
     public function tauxReel(): float
@@ -77,7 +77,7 @@ readonly class Avancement
     }
 
     /**
-     * Ecart, en points, entre l'avancement constate et celui qu'on attendrait
+     * Écart, en points, entre l'avancement constate et celui qu'on attendrait
      * a cette date compte tenu du calendrier. Negatif = retard.
      */
     public function ecartSurAttendu(float $tauxAttendu): float

@@ -10,62 +10,62 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 /**
- * L'ossature institutionnelle : les treize facultes de l'Universite de
- * Kinshasa, leurs departements, et une annee academique ouverte.
+ * L'ossature institutionnelle : les treize facultés de l'Université de
+ * Kinshasa, leurs departements, et une année académique ouverte.
  *
- * La liste des facultes suit celle publiee par l'universite. Les departements
+ * La liste des facultés suit celle publiee par l'université. Les departements
  * retenus sont ceux dont les programmes sont charges par le ProgrammeSeeder ;
- * les autres facultes sont creees sans departement, pretes a etre completees
- * par le secretariat academique.
+ * les autres facultés sont creees sans departement, pretes a etre completees
+ * par le secrétariat académique.
  */
 class StructureAcademiqueSeeder extends Seeder
 {
     /** @var list<array{nom: string, sigle: string, departements?: list<array{nom: string, sigle: string}>}> */
     private const FACULTES = [
         [
-            'nom' => 'Faculte de Droit',
+            'nom' => 'Faculté de Droit',
             'sigle' => 'DROIT',
             'departements' => [
-                ['nom' => 'Droit prive et judiciaire', 'sigle' => 'DPJ'],
+                ['nom' => 'Droit privé et judiciaire', 'sigle' => 'DPJ'],
                 ['nom' => 'Droit public interne et international', 'sigle' => 'DPI'],
-                ['nom' => 'Droit economique et social', 'sigle' => 'DES'],
+                ['nom' => 'Droit économique et social', 'sigle' => 'DES'],
             ],
         ],
         [
-            'nom' => 'Faculte de Medecine',
+            'nom' => 'Faculté de Médecine',
             'sigle' => 'MED',
             'departements' => [
-                ['nom' => 'Sciences biomedicales', 'sigle' => 'BIOMED'],
-                ['nom' => 'Medecine generale', 'sigle' => 'MG'],
+                ['nom' => 'Sciences biomédicales', 'sigle' => 'BIOMED'],
+                ['nom' => 'Médecine générale', 'sigle' => 'MG'],
             ],
         ],
         [
-            'nom' => 'Faculte Polytechnique',
+            'nom' => 'Faculté Polytechnique',
             'sigle' => 'POLY',
             'departements' => [
-                ['nom' => 'Genie civil', 'sigle' => 'GC'],
-                ['nom' => 'Genie electrique', 'sigle' => 'GE'],
-                ['nom' => 'Genie informatique', 'sigle' => 'GI'],
-                ['nom' => 'Genie mecanique', 'sigle' => 'GM'],
+                ['nom' => 'Génie civil', 'sigle' => 'GC'],
+                ['nom' => 'Génie electrique', 'sigle' => 'GE'],
+                ['nom' => 'Génie informatique', 'sigle' => 'GI'],
+                ['nom' => 'Génie mécanique', 'sigle' => 'GM'],
             ],
         ],
         [
-            'nom' => 'Faculte des Sciences Economiques et de Gestion',
+            'nom' => 'Faculté des Sciences Économiques et de Gestion',
             'sigle' => 'FASEG',
             'departements' => [
-                ['nom' => 'Sciences economiques', 'sigle' => 'ECO'],
+                ['nom' => 'Sciences économiques', 'sigle' => 'ECO'],
                 ['nom' => 'Sciences de gestion', 'sigle' => 'GESTION'],
             ],
         ],
-        ['nom' => 'Faculte des Lettres et Sciences Humaines', 'sigle' => 'FLSH'],
-        ['nom' => 'Faculte des Sciences et Technologies', 'sigle' => 'FST'],
-        ['nom' => 'Faculte des Sciences Pharmaceutiques', 'sigle' => 'PHARMA'],
-        ['nom' => 'Faculte de Medecine Veterinaire', 'sigle' => 'VETO'],
-        ['nom' => 'Faculte de Medecine Bucco-Dentaire', 'sigle' => 'DENT'],
-        ['nom' => 'Faculte des Sciences Agronomiques et Environnement', 'sigle' => 'AGRO'],
-        ['nom' => 'Faculte de Psychologie et des Sciences de l\'Education', 'sigle' => 'FPSE'],
-        ['nom' => 'Faculte des Sciences Sociales, Administratives et Politiques', 'sigle' => 'FSSAP'],
-        ['nom' => 'Faculte de Petrole, Gaz et Energies Renouvelables', 'sigle' => 'FPGER'],
+        ['nom' => 'Faculté des Lettres et Sciences Humaines', 'sigle' => 'FLSH'],
+        ['nom' => 'Faculté des Sciences et Technologies', 'sigle' => 'FST'],
+        ['nom' => 'Faculté des Sciences Pharmaceutiques', 'sigle' => 'PHARMA'],
+        ['nom' => 'Faculté de Médecine Vétérinaire', 'sigle' => 'VETO'],
+        ['nom' => 'Faculté de Médecine Bucco-Dentaire', 'sigle' => 'DENT'],
+        ['nom' => 'Faculté des Sciences Agronomiques et Environnement', 'sigle' => 'AGRO'],
+        ['nom' => 'Faculté de Psychologie et des Sciences de l\'Éducation', 'sigle' => 'FPSE'],
+        ['nom' => 'Faculté des Sciences Sociales, Administratives et Politiques', 'sigle' => 'FSSAP'],
+        ['nom' => 'Faculté de Pétrole, Gaz et Énergies Renouvelables', 'sigle' => 'FPGER'],
     ];
 
     public function run(): void
@@ -95,12 +95,12 @@ class StructureAcademiqueSeeder extends Seeder
     }
 
     /**
-     * Ouvre l'annee academique qui contient la date du jour, sur le calendrier
+     * Ouvre l'année académique qui contient la date du jour, sur le calendrier
      * congolais : rentree a la mi-octobre, cloture fin juillet.
      *
      * Le seeder de demonstration s'appuie sur ces bornes pour situer les
-     * seances. En production, ces dates sont saisies par le secretariat
-     * academique et non deduites.
+     * seances. En production, ces dates sont saisies par le secrétariat
+     * académique et non deduites.
      */
     private function ouvrirAnneeAcademique(): AnneeAcademique
     {
@@ -121,7 +121,7 @@ class StructureAcademiqueSeeder extends Seeder
         );
     }
 
-    /** Quelques salles par faculte, pour que la saisie ait ou se poser. */
+    /** Quelques salles par faculté, pour que la saisie ait ou se poser. */
     private function creerLocaux(Faculte $faculte): void
     {
         $salles = [

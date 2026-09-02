@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Une ligne de la liste des matricules deposee par le secretariat academique.
+ * Une ligne de la liste des matricules deposee par le secrétariat académique.
  * Tant qu'elle n'est pas activee, aucun compte ne lui correspond.
  */
 class InscriptionAutorisee extends Model

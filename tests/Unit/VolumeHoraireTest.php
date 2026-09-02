@@ -8,8 +8,8 @@ use PHPUnit\Framework\TestCase;
 class VolumeHoraireTest extends TestCase
 {
     /**
-     * Le chiffre de reference : la faculte de medecine de l'UNILU publie 750
-     * heures de travail etudiant pour les 30 credits d'un semestre. Si cette
+     * Le chiffre de reference : la faculté de médecine de l'UNILU publie 750
+     * heures de travail étudiant pour les 30 crédits d'un semestre. Si cette
      * assertion tombe, la regle de conversion a derive.
      */
     public function test_un_semestre_de_trente_credits_vaut_750_heures(): void
@@ -27,7 +27,7 @@ class VolumeHoraireTest extends TestCase
             $this->assertSame(
                 $credits * VolumeHoraire::HEURES_PAR_CREDIT,
                 VolumeHoraire::heuresEncadrees($credits) + VolumeHoraire::heuresTpe($credits),
-                "Le total ne tombe pas juste pour {$credits} credits.",
+                "Le total ne tombe pas juste pour {$credits} crédits.",
             );
         }
     }

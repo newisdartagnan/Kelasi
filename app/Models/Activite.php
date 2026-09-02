@@ -21,9 +21,9 @@ class Activite extends Model
     public const TYPES = [
         'examen' => 'Examen',
         'interrogation' => 'Interrogation',
-        'visite' => 'Visite guidee',
-        'conference' => 'Conference',
-        'deliberation' => 'Deliberation',
+        'visite' => 'Visite guidée',
+        'conference' => 'Conférence',
+        'deliberation' => 'Délibération',
         'autre' => 'Autre',
     ];
 
@@ -78,8 +78,8 @@ class Activite extends Model
 
     /**
      * Les activites qu'un utilisateur doit voir : celles de sa promotion, de
-     * son departement, de sa faculte, plus celles ouvertes a toute
-     * l'universite. C'est la portee qui decide, jamais le createur.
+     * son departement, de sa faculté, plus celles ouvertes a toute
+     * l'université. C'est la portee qui decide, jamais le createur.
      */
     public function scopeVisiblesPour(Builder $query, User $user): Builder
     {

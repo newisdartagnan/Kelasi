@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Le programme des cours n'appartient pas a l'enseignant : il est arrete par
- * l'autorite academique. Toute demande de modification (volume horaire,
- * intitule, repartition CMI/TD/TP) remonte donc au VDE, qui tranche.
+ * l'autorite académique. Toute demande de modification (volume horaire,
+ * intitule, répartition CMI/TD/TP) remonte donc au VDE, qui tranche.
  */
 return new class extends Migration
 {
@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('cours_id')->constrained('cours')->cascadeOnDelete();
             $table->foreignId('demandeur_id')->constrained('users')->cascadeOnDelete();
 
-            $table->string('type', 30);        // volume|intitule|repartition|report|autre
+            $table->string('type', 30);        // volume|intitule|répartition|report|autre
             $table->text('description');
             $table->text('justification');
             $table->json('modifications')->nullable();  // valeurs proposees, champ -> valeur

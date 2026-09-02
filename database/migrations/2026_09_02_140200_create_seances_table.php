@@ -7,17 +7,17 @@ use Illuminate\Support\Facades\Schema;
 /**
  * La seance de cours : l'objet central de Kelasi.
  *
- * Le chef de promotion saisit ce qui s'est reellement passe dans la salle ;
+ * Le chef de promotion saisit ce qui s'est réellement passe dans la salle ;
  * l'enseignant contresigne. Sans cette contresignature, la seance ne compte
  * pas dans l'avancement -- c'est ce qui donne au chiffre sa valeur probante.
  *
  * Cycle de vie :
- *   brouillon -> soumise -> validee
- *                        -> contestee -> (corrigee) -> soumise
- *                annulee
+ *   brouillon -> soumise -> validée
+ *                        -> contestée -> (corrigee) -> soumise
+ *                annulée
  *
  * L'uuid est fourni par le client. Il rend la synchronisation hors ligne
- * idempotente : un CP qui saisit sans reseau puis se synchronise deux fois
+ * idempotente : un CP qui saisit sans réseau puis se synchronise deux fois
  * ne cree pas deux seances.
  */
 return new class extends Migration
@@ -38,7 +38,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('duree_minutes');   // derivee, figee a l'ecriture
             $table->string('type', 20);                      // cmi|td|tp|examen|interrogation
 
-            $table->text('matiere_couverte');                // ce qui a reellement ete traite
+            $table->text('matiere_couverte');                // ce qui a réellement ete traité
             $table->text('observations')->nullable();
             $table->unsignedInteger('effectif_present')->nullable();
 

@@ -28,7 +28,7 @@ class AnneeAcademique extends Model
         return $this->hasMany(Promotion::class);
     }
 
-    /** L'annee sur laquelle travaille toute l'application. */
+    /** L'année sur laquelle travaille toute l'application. */
     public static function courante(): ?self
     {
         return static::where('active', true)->first();
