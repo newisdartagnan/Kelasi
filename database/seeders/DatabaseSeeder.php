@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             RolesEtPermissionsSeeder::class,
             StructureAcademiqueSeeder::class,
             ProgrammeSeeder::class,
+            DemonstrationSeeder::class,
         ]);
     }
 }

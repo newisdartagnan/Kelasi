@@ -16,6 +16,10 @@ use Illuminate\Support\Facades\DB;
  * Repond a la question que toute l'application existe pour resoudre :
  * ou en est reellement le cours X, et de combien est-il en retard ?
  *
+ * Tous les calculs acceptent un semestre. Sans lui, on melangerait un premier
+ * semestre acheve avec un second a peine commence, et le taux consolide ne
+ * voudrait plus rien dire.
+ *
  * Les agregats sont calcules en une requete groupee plutot que cours par
  * cours -- un doyen ouvre son tableau de bord sur trois cents cours, et le
  * fait souvent depuis une connexion mobile lente.
@@ -32,14 +36,15 @@ class CalculateurAvancement
 
     /**
      * Avancement de chaque cours d'une promotion, indexe par identifiant de
-     * cours. Une seule requete pour les seances, une pour les cours.
+     * cours. Une requete pour les cours, une pour les seances.
      *
      * @return Collection<int, Avancement>
      */
-    public function parCoursDePromotion(Promotion $promotion): Collection
+    public function parCoursDePromotion(Promotion $promotion, ?int $semestre = null): Collection
     {
         $cours = Cours::query()
-            ->whereHas('uniteEnseignement', fn ($q) => $q->where('promotion_id', $promotion->id))
+            ->whereHas('uniteEnseignement', fn ($q) => $q->where('promotion_id', $promotion->id)
+                ->when($semestre, fn ($s) => $s->where('semestre', $semestre)))
             ->where('actif', true)
             ->get(['id', 'heures_cmi', 'heures_td', 'heures_tp']);
 
@@ -51,10 +56,9 @@ class CalculateurAvancement
     }
 
     /** Avancement consolide d'une promotion. */
-    public function pourPromotion(Promotion $promotion): Avancement
+    public function pourPromotion(Promotion $promotion, ?int $semestre = null): Avancement
     {
-        return $this->parCoursDePromotion($promotion)
-            ->reduce(fn (Avancement $porte, Avancement $a) => $porte->plus($a), Avancement::vide());
+        return $this->consolider($this->parCoursDePromotion($promotion, $semestre));
     }
 
     /**
@@ -63,8 +67,11 @@ class CalculateurAvancement
      *
      * @return Collection<int, Avancement>
      */
-    public function parPromotionDeFaculte(Faculte $faculte, ?AnneeAcademique $annee = null): Collection
-    {
+    public function parPromotionDeFaculte(
+        Faculte $faculte,
+        ?AnneeAcademique $annee = null,
+        ?int $semestre = null,
+    ): Collection {
         $annee ??= AnneeAcademique::courante();
 
         $promotions = Promotion::query()
@@ -80,19 +87,18 @@ class CalculateurAvancement
         $prevues = DB::table('cours')
             ->join('unites_enseignement', 'cours.unite_enseignement_id', '=', 'unites_enseignement.id')
             ->whereIn('unites_enseignement.promotion_id', $promotions)
+            ->when($semestre, fn ($q) => $q->where('unites_enseignement.semestre', $semestre))
             ->where('cours.actif', true)
             ->groupBy('unites_enseignement.promotion_id')
-            ->selectRaw('unites_enseignement.promotion_id, SUM(cours.heures_cmi + cours.heures_td + cours.heures_tp) * 60 AS minutes')
-            ->pluck('minutes', 'promotion_id');
+            ->selectRaw('unites_enseignement.promotion_id AS pid, SUM(cours.heures_cmi + cours.heures_td + cours.heures_tp) * 60 AS minutes')
+            ->pluck('minutes', 'pid');
 
-        $realisees = DB::table('seances')
-            ->whereIn('promotion_id', $promotions)
-            ->whereIn('type', Seance::TYPES_ENSEIGNEMENT)
-            ->whereIn('statut', [Seance::STATUT_VALIDEE, Seance::STATUT_SOUMISE])
-            ->groupBy('promotion_id', 'statut')
-            ->selectRaw('promotion_id, statut, SUM(duree_minutes) AS minutes')
+        $realisees = $this->requeteSeances($semestre)
+            ->whereIn('seances.promotion_id', $promotions)
+            ->groupBy('seances.promotion_id', 'seances.statut')
+            ->selectRaw('seances.promotion_id AS pid, seances.statut AS statut, SUM(seances.duree_minutes) AS minutes')
             ->get()
-            ->groupBy('promotion_id');
+            ->groupBy('pid');
 
         return $promotions->mapWithKeys(function (int $id) use ($prevues, $realisees) {
             $lignes = $realisees->get($id, collect());
@@ -106,15 +112,14 @@ class CalculateurAvancement
     }
 
     /** Avancement consolide d'une faculte. */
-    public function pourFaculte(Faculte $faculte, ?AnneeAcademique $annee = null): Avancement
+    public function pourFaculte(Faculte $faculte, ?AnneeAcademique $annee = null, ?int $semestre = null): Avancement
     {
-        return $this->parPromotionDeFaculte($faculte, $annee)
-            ->reduce(fn (Avancement $porte, Avancement $a) => $porte->plus($a), Avancement::vide());
+        return $this->consolider($this->parPromotionDeFaculte($faculte, $annee, $semestre));
     }
 
     /**
-     * Part de l'annee academique ecoulee, en pourcentage. Sert de reference
-     * pour dire si un cours est en avance ou en retard : a la mi-parcours, on
+     * Part de la periode ecoulee, en pourcentage. Sert de reference pour dire
+     * si un enseignement est en avance ou en retard : a la mi-parcours, on
      * attend la moitie du volume.
      */
     public function tauxAttendu(?AnneeAcademique $annee = null, ?CarbonInterface $a = null): float
@@ -135,6 +140,15 @@ class CalculateurAvancement
         $ecoules = $annee->date_debut->diffInDays($a, absolute: false);
 
         return round(max(0, min(100, $ecoules / $total * 100)), 1);
+    }
+
+    /** @param  Collection<int, Avancement>  $avancements */
+    private function consolider(Collection $avancements): Avancement
+    {
+        return $avancements->reduce(
+            fn (Avancement $porte, Avancement $a) => $porte->plus($a),
+            Avancement::vide(),
+        );
     }
 
     /**
@@ -159,6 +173,21 @@ class CalculateurAvancement
             ->groupBy('cours_id')
             ->map(fn ($lignes) => $lignes->pluck('minutes', 'statut')->all())
             ->all();
+    }
+
+    /**
+     * Les seances qui comptent : celles d'enseignement, saisies ou validees.
+     * Le filtre par semestre passe par l'unite d'enseignement du cours.
+     */
+    private function requeteSeances(?int $semestre): \Illuminate\Database\Query\Builder
+    {
+        return DB::table('seances')
+            ->when($semestre, fn ($q) => $q
+                ->join('cours', 'seances.cours_id', '=', 'cours.id')
+                ->join('unites_enseignement', 'cours.unite_enseignement_id', '=', 'unites_enseignement.id')
+                ->where('unites_enseignement.semestre', $semestre))
+            ->whereIn('seances.type', Seance::TYPES_ENSEIGNEMENT)
+            ->whereIn('seances.statut', [Seance::STATUT_VALIDEE, Seance::STATUT_SOUMISE]);
     }
 
     /** @param  array<string, int>  $minutesParStatut */

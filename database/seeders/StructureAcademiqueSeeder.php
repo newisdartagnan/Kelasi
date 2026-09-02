@@ -70,15 +70,7 @@ class StructureAcademiqueSeeder extends Seeder
 
     public function run(): void
     {
-        AnneeAcademique::updateOrCreate(
-            ['libelle' => '2025-2026'],
-            [
-                'date_debut' => '2025-10-13',
-                'date_fin' => '2026-07-31',
-                'statut' => 'en_cours',
-                'active' => true,
-            ],
-        );
+        $this->ouvrirAnneeAcademique();
 
         foreach (self::FACULTES as $ordre => $donnees) {
             $faculte = Faculte::updateOrCreate(
@@ -100,6 +92,33 @@ class StructureAcademiqueSeeder extends Seeder
 
             $this->creerLocaux($faculte);
         }
+    }
+
+    /**
+     * Ouvre l'annee academique qui contient la date du jour, sur le calendrier
+     * congolais : rentree a la mi-octobre, cloture fin juillet.
+     *
+     * Le seeder de demonstration s'appuie sur ces bornes pour situer les
+     * seances. En production, ces dates sont saisies par le secretariat
+     * academique et non deduites.
+     */
+    private function ouvrirAnneeAcademique(): AnneeAcademique
+    {
+        $rentree = now()->month >= 10
+            ? now()->copy()->setDate(now()->year, 10, 15)
+            : now()->copy()->setDate(now()->year - 1, 10, 15);
+
+        $cloture = $rentree->copy()->addYear()->setDate($rentree->year + 1, 7, 31);
+
+        return AnneeAcademique::updateOrCreate(
+            ['libelle' => $rentree->year.'-'.($rentree->year + 1)],
+            [
+                'date_debut' => $rentree->toDateString(),
+                'date_fin' => $cloture->toDateString(),
+                'statut' => 'en_cours',
+                'active' => true,
+            ],
+        );
     }
 
     /** Quelques salles par faculte, pour que la saisie ait ou se poser. */

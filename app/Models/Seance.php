@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -125,18 +124,5 @@ class Seance extends Model
     public function estModifiable(): bool
     {
         return in_array($this->statut, [self::STATUT_BROUILLON, self::STATUT_CONTESTEE], true);
-    }
-
-    /**
-     * Calcule la duree a partir des bornes horaires. Une seance qui deborde
-     * minuit n'existe pas dans une universite : on refuse plutot que de
-     * deviner.
-     */
-    public static function dureeEnMinutes(string $debut, string $fin): int
-    {
-        $d = Carbon::parse($debut);
-        $f = Carbon::parse($fin);
-
-        return max(0, $f->diffInMinutes($d, absolute: true));
     }
 }
