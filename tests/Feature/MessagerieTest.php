@@ -157,6 +157,29 @@ class MessagerieTest extends TestCase
         $this->assertSame($this->chef->id, $proposes->first()->id);
     }
 
+    /**
+     * PostgreSQL rend LIKE sensible à la casse, là où SQLite ne l'est pas.
+     * Chercher « ilunga » doit trouver ILUNGA : personne ne tape un nom de
+     * famille en capitales.
+     */
+    public function test_la_recherche_ignore_la_casse(): void
+    {
+        foreach (['KABEYA', 'kabeya', 'Kabeya', 'kab'] as $saisie) {
+            $this->assertTrue(
+                $this->messagerie->destinatairesPossibles($this->etudiant, $saisie)
+                    ->contains('id', $this->chef->id),
+                "La recherche « {$saisie} » n'a pas retrouvé le chef de promotion.",
+            );
+        }
+    }
+
+    public function test_la_recherche_par_matricule_ignore_aussi_la_casse(): void
+    {
+        $trouves = $this->messagerie->destinatairesPossibles($this->etudiant, 'cp-001');
+
+        $this->assertTrue($trouves->contains('id', $this->chef->id));
+    }
+
     public function test_l_ecran_s_ouvre(): void
     {
         $this->actingAs($this->chef)->get('/messages')->assertOk()->assertSee('Messages');

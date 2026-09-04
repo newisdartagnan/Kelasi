@@ -163,11 +163,50 @@ l'équipe n'ait ni nouvel outillage ni nouvelle exploitation à apprendre.
 
 - **Laravel 12** / PHP 8.3+
 - **Livewire 3**, Alpine, **Tailwind 4**, Vite
-- **PostgreSQL** en production (SQLite pour les tests)
+- **PostgreSQL 16**, en production comme en test
+- **Redis** pour le cache, les sessions et la file
+- **Docker** : nginx, PHP-FPM, ordonnanceur et ouvrier de file
 - `spatie/laravel-permission` pour les rôles, `spatie/laravel-activitylog`
   pour la traçabilité
 
-## Installation
+## Déploiement
+
+```bash
+cp .env.example .env
+# renseigner DB_PASSWORD, et les ports si ceux par défaut sont pris
+docker compose run --rm app php artisan key:generate
+./deploy.sh
+```
+
+L'application écoute sur le port **8090**, Adminer sur **8091**, et la base
+est publiée sur **5434** pour pgAdmin ou DBeaver. Ces ports sortent des
+valeurs habituelles à dessein : sous Windows, 80, 443 et 5432 sont souvent
+déjà pris — par IIS, les plages Hyper-V ou un PostgreSQL local — et le
+démarrage échoue alors sur un « bind: access permissions » peu parlant.
+Chacun se règle par variable dans `.env`.
+
+Six services : l'application en PHP-FPM, nginx, PostgreSQL 16, Redis, un
+ordonnanceur et un ouvrier de file. Les deux derniers ne sont pas
+décoratifs — sans l'ordonnanceur les rappels du matin ne partent jamais,
+sans l'ouvrier les notifications s'empilent sans être envoyées.
+
+`./deploy.sh` se relance sans crainte : il refuse de démarrer sans clé
+d'application ni mot de passe de base plutôt que de laisser une installation
+à moitié faite.
+
+### Sauvegardes
+
+```bash
+./backup.sh                                   # à brancher sur une tâche planifiée
+./restore.sh backups/kelasi_20260904_060000.dump
+```
+
+La sauvegarde couvre la base et les supports de cours déposés. Le script
+échoue si le fichier produit fait moins d'un kilo-octet : une sauvegarde
+vide passerait inaperçue et donnerait une fausse sécurité. La restauration
+demande une confirmation tapée, parce qu'elle écrase les données en place.
+
+## Installation pour le développement
 
 ```bash
 composer install
@@ -176,12 +215,19 @@ npm install
 cp .env.example .env
 php artisan key:generate
 
-touch database/database.sqlite      # ou configurer PostgreSQL dans .env
+# PostgreSQL, comme en production
+createdb kelasi && createdb kelasi_test
 php artisan migrate --seed
 
 npm run build
 php artisan serve
 ```
+
+Les tests s'exécutent contre PostgreSQL, et non contre SQLite : c'est le
+moteur de production, et les deux ne se comportent pas pareil. Le premier
+écart rencontré fut `LIKE`, sensible à la casse en PostgreSQL — la recherche
+de destinataires ne trouvait plus personne dès qu'on tapait un nom en
+minuscules.
 
 Le seeder installe les treize facultés, les cinq maquettes, et un jeu de
 démonstration avec un semestre déjà entamé — dont un cours sur cinq en
@@ -209,7 +255,6 @@ crée pas de doublon.
 
 ## Ce qui reste à faire
 
-- Déploiement : PostgreSQL et Docker, en reprenant ceux du projet hospitalier
 - Suspension et réactivation des comptes par les doyens et le VDE
 - Réinitialisation de mot de passe approuvée par la hiérarchie
 - Conversations de groupe (les tables les prévoient, l'interface non)

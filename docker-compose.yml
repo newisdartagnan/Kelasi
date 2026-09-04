@@ -1,0 +1,156 @@
+# Kelasi — pile de déploiement.
+#
+# Les ports publiés sortent des valeurs habituelles : sous Windows, 80, 443 et
+# 5432 sont souvent déjà pris (IIS, plages Hyper-V, un PostgreSQL local), et
+# le démarrage échoue alors sur un « bind: access permissions » peu parlant.
+# Chaque port reste réglable par variable d'environnement.
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    init: true
+    env_file: .env
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      APP_KEY: ${APP_KEY}
+      APP_URL: ${APP_URL:-http://localhost:8090}
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: ${KELASI_DB_NAME:-kelasi}
+      DB_USERNAME: ${KELASI_DB_USER:-kelasi_user}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+      QUEUE_CONNECTION: redis
+      CACHE_STORE: redis
+      SESSION_DRIVER: redis
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY}
+    volumes:
+      # Le stockage et les sauvegardes survivent à une reconstruction d'image ;
+      # les supports de cours déposés vivent dans storage/.
+      - ./storage:/var/www/storage
+      - ./public:/var/www/public
+      - ./backups:/backups
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "${KELASI_HTTP_PORT:-8090}:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./public:/var/www/public:ro
+    depends_on:
+      - app
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      # Publié hors du 5432 : un PostgreSQL déjà installé sur la machine garde
+      # son port, et pgAdmin ou DBeaver se branchent ici en tant que DBA.
+      - "${KELASI_DB_PORT:-5434}:5432"
+    environment:
+      POSTGRES_DB: ${KELASI_DB_NAME:-kelasi}
+      POSTGRES_USER: ${KELASI_DB_USER:-kelasi_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      # Le tri et les messages en français, et l'UTF-8 par défaut : les noms
+      # congolais portent des accents, et l'ordre alphabétique doit les placer
+      # correctement.
+      LANG: fr_FR.utf8
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backups:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${KELASI_DB_USER:-kelasi_user} -d ${KELASI_DB_NAME:-kelasi}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redisdata:/data
+
+  # Les rappels du matin partent d'ici : sans ce service, la planification
+  # d'artisan ne s'exécute jamais et personne ne reçoit rien.
+  scheduler:
+    build: .
+    command: php artisan schedule:work
+    restart: unless-stopped
+    init: true
+    env_file: .env
+    environment:
+      APP_KEY: ${APP_KEY}
+      APP_URL: ${APP_URL:-http://localhost:8090}
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: ${KELASI_DB_NAME:-kelasi}
+      DB_USERNAME: ${KELASI_DB_USER:-kelasi_user}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+      QUEUE_CONNECTION: redis
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY}
+    volumes:
+      - ./storage:/var/www/storage
+      - ./backups:/backups
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  # Les notifications et les envois de push passent par la file : sans ce
+  # service, elles s'empilent sans jamais partir.
+  queue:
+    build: .
+    command: php artisan queue:work --tries=3 --max-time=3600
+    restart: unless-stopped
+    init: true
+    env_file: .env
+    environment:
+      APP_KEY: ${APP_KEY}
+      APP_URL: ${APP_URL:-http://localhost:8090}
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: ${KELASI_DB_NAME:-kelasi}
+      DB_USERNAME: ${KELASI_DB_USER:-kelasi_user}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+      QUEUE_CONNECTION: redis
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY}
+    volumes:
+      - ./storage:/var/www/storage
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  adminer:
+    image: adminer:latest
+    restart: unless-stopped
+    ports:
+      - "${KELASI_ADMINER_PORT:-8091}:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
+  redisdata:

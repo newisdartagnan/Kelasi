@@ -127,6 +127,11 @@ class Messagerie
      * un enseignant, mais pas à n'importe lequel de l'université. On restreint
      * donc aussi au périmètre — sa faculté, sa promotion.
      *
+     * La recherche compare en minuscules des deux côtés. PostgreSQL rend LIKE
+     * sensible à la casse, là où SQLite ne l'est pas : sans cela, chercher
+     * « bolima » ne trouverait pas BOLIMA, et personne ne tape un nom de
+     * famille en capitales.
+     *
      * @return Collection<int, User>
      */
     public function destinatairesPossibles(User $utilisateur, string $recherche = ''): Collection
@@ -142,10 +147,13 @@ class Messagerie
             ->whereKeyNot($utilisateur->id)
             ->role($roles)
             ->when(! $utilisateur->aPorteeUniversitaire(), fn (Builder $q) => $this->limiterAuPerimetre($q, $utilisateur))
-            ->when($recherche !== '', fn (Builder $q) => $q->where(fn (Builder $s) => $s
-                ->where('name', 'like', "%{$recherche}%")
-                ->orWhere('prenom', 'like', "%{$recherche}%")
-                ->orWhere('matricule', 'like', "%{$recherche}%")))
+            ->when($recherche !== '', fn (Builder $q) => $q->where(
+                fn (Builder $s) => collect(['name', 'prenom', 'matricule'])
+                    ->each(fn (string $champ) => $s->orWhereRaw(
+                        "LOWER({$champ}) LIKE ?",
+                        ['%'.mb_strtolower($recherche).'%'],
+                    )),
+            ))
             ->with('roles')
             ->orderBy('name')
             ->limit(30)
