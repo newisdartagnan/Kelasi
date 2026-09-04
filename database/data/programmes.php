@@ -86,13 +86,13 @@ return [
                         'code' => 'UE7', 'intitule' => 'Informatique et méthodes de recherche', 'semestre' => 2, 'credits' => 6,
                         'cours' => [
                             ['code' => 'INF102', 'intitule' => 'Informatique 2 : algorithmique', 'credits' => 3, 'parts' => ['tp' => 0.5]],
-                            ['code' => 'MET101', 'intitule' => 'Introduction a la recherche scientifique', 'credits' => 3, 'parts' => ['td' => 0.3]],
+                            ['code' => 'MET101', 'intitule' => 'Introduction à la recherche scientifique', 'credits' => 3, 'parts' => ['td' => 0.3]],
                         ],
                     ],
                     [
                         'code' => 'UE8', 'intitule' => 'Formation générale', 'semestre' => 2, 'credits' => 5,
                         'cours' => [
-                            ['code' => 'CIT101', 'intitule' => 'Éducation a la citoyenneté', 'credits' => 2],
+                            ['code' => 'CIT101', 'intitule' => 'Éducation à la citoyenneté', 'credits' => 2],
                             ['code' => 'ANG102', 'intitule' => 'Anglais technique II', 'credits' => 3, 'parts' => ['td' => 0.5]],
                         ],
                     ],
@@ -116,7 +116,7 @@ return [
                         ],
                     ],
                     [
-                        'code' => 'UE3-RCH', 'intitule' => 'Initiation a la recherche', 'semestre' => 1, 'credits' => 7,
+                        'code' => 'UE3-RCH', 'intitule' => 'Initiation à la recherche', 'semestre' => 1, 'credits' => 7,
                         'cours' => [
                             ['code' => 'BST101', 'intitule' => 'Biostatistique', 'credits' => 4, 'parts' => ['td' => 0.35]],
                             ['code' => 'INF103', 'intitule' => 'Informatique médicale', 'credits' => 3, 'parts' => ['tp' => 0.5]],
@@ -147,7 +147,7 @@ return [
                     [
                         'code' => 'UE5-IDP', 'intitule' => 'Formation générale', 'semestre' => 2, 'credits' => 4,
                         'cours' => [
-                            ['code' => 'CIT102', 'intitule' => 'Éducation a la citoyenneté', 'credits' => 2],
+                            ['code' => 'CIT102', 'intitule' => 'Éducation à la citoyenneté', 'credits' => 2],
                             ['code' => 'ANG103', 'intitule' => 'Anglais médical', 'credits' => 2, 'parts' => ['td' => 0.5]],
                         ],
                     ],
@@ -164,7 +164,7 @@ return [
                     [
                         'code' => 'UE1', 'intitule' => 'Fondements du droit', 'semestre' => 1, 'credits' => 12,
                         'cours' => [
-                            ['code' => 'DRT101', 'intitule' => 'Introduction générale a l\'étude du droit', 'credits' => 6, 'parts' => ['td' => 0.25]],
+                            ['code' => 'DRT101', 'intitule' => 'Introduction générale à l\'étude du droit', 'credits' => 6, 'parts' => ['td' => 0.25]],
                             ['code' => 'DRT102', 'intitule' => 'Droit civil : les personnes et la famille', 'credits' => 6, 'parts' => ['td' => 0.25]],
                         ],
                     ],
@@ -211,7 +211,7 @@ return [
                     [
                         'code' => 'UE8', 'intitule' => 'Formation générale', 'semestre' => 2, 'credits' => 4,
                         'cours' => [
-                            ['code' => 'CIT103', 'intitule' => 'Éducation a la citoyenneté', 'credits' => 2],
+                            ['code' => 'CIT103', 'intitule' => 'Éducation à la citoyenneté', 'credits' => 2],
                             ['code' => 'INF104', 'intitule' => 'Informatique appliquée au droit', 'credits' => 2, 'parts' => ['tp' => 0.5]],
                         ],
                     ],
@@ -331,7 +331,7 @@ return [
                     [
                         'code' => 'UE8', 'intitule' => 'Formation générale', 'semestre' => 2, 'credits' => 3,
                         'cours' => [
-                            ['code' => 'CIT111', 'intitule' => 'Éducation a la citoyenneté', 'credits' => 3],
+                            ['code' => 'CIT111', 'intitule' => 'Éducation à la citoyenneté', 'credits' => 3],
                         ],
                     ],
                 ],

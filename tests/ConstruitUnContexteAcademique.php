@@ -76,7 +76,7 @@ trait ConstruitUnContexteAcademique
         $this->cours = Cours::create([
             'unite_enseignement_id' => $ue->id,
             'code' => 'DRT101',
-            'intitule' => 'Introduction générale a l\'étude du droit',
+            'intitule' => 'Introduction générale à l\'étude du droit',
             'credits' => 6,
             'heures_cmi' => $volume['cmi'],
             'heures_td' => $volume['td'],

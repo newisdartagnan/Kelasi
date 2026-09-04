@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ConnexionController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\SynchronisationController;
 use App\Http\Controllers\TelechargementController;
 use App\Livewire\ActiverMonCompte;
@@ -36,6 +37,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/seances/synchroniser', SynchronisationController::class)->name('seances.synchroniser');
 
     Route::get('/activites', Activites::class)->name('activites');
+
+    Route::get('/avancement/export', ExportController::class)->name('avancement.export');
 
     Route::get('/messages', MessagerieInterne::class)->name('messages');
 

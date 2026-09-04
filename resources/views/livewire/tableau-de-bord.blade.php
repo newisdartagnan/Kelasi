@@ -27,6 +27,17 @@
             </p>
         </div>
 
+        <div class="flex items-center gap-2">
+            @can('export.generer.faculte')
+                <a
+                    href="{{ route('avancement.export', array_filter(['semestre' => $semestre, 'faculte' => $faculteId])) }}"
+                    class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                    title="Télécharger l'avancement au format Excel"
+                >
+                    Exporter
+                </a>
+            @endcan
+
         {{-- Le sélecteur de semestre : sans lui, un premier semestre achevé et un
              second à peine commencé se moyenneraient en un chiffre trompeur. --}}
         <div class="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 text-sm">
@@ -43,6 +54,7 @@
                     {{ $libelle }}
                 </button>
             @endforeach
+            </div>
         </div>
     </div>
 
