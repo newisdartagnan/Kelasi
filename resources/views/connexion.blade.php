@@ -69,8 +69,15 @@
         </div>
     </form>
 
-    <p class="mt-6 text-center text-xs leading-relaxed text-slate-500">
-        Votre compte est ouvert par le secrétariat académique à partir de votre matricule.
+    <p class="mt-6 text-center text-sm text-slate-600">
+        Premier accès ?
+        <a href="{{ route('activation') }}" class="font-medium text-kelasi-600 hover:underline">
+            Ouvrir mon compte
+        </a>
+    </p>
+
+    <p class="mt-3 text-center text-xs leading-relaxed text-slate-500">
+        Votre compte s'ouvre à partir du matricule déposé par le secrétariat académique.
         Il n'y a pas d'inscription libre.
     </p>
 </div>

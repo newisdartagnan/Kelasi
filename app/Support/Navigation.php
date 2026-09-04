@@ -37,6 +37,10 @@ final class Navigation
 
         $liens[] = ['route' => 'seances.journal', 'libelle' => 'Journal', 'icone' => '☰'];
 
+        if ($utilisateur->can('inscription.deposer')) {
+            $liens[] = ['route' => 'inscrits', 'libelle' => 'Inscrits', 'icone' => '☷'];
+        }
+
         return $liens;
     }
 
