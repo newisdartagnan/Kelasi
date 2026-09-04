@@ -36,6 +36,8 @@ final class Navigation
             ];
         }
 
+        $liens[] = ['route' => 'activites', 'libelle' => 'Activités', 'icone' => '◈'];
+
         if ($utilisateur->can('demande.arbitrer')) {
             $liens[] = [
                 'route' => 'demandes',
