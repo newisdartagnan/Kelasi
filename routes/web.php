@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\ConnexionController;
 use App\Http\Controllers\SynchronisationController;
+use App\Http\Controllers\TelechargementController;
 use App\Livewire\ActiverMonCompte;
 use App\Livewire\Activites;
 use App\Livewire\DemandesDeModification;
+use App\Livewire\DocumentsDeCours;
 use App\Livewire\ImporterLesInscrits;
 use App\Livewire\JournalDesSeances;
 use App\Livewire\SaisirSeance;
@@ -33,6 +35,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/seances/synchroniser', SynchronisationController::class)->name('seances.synchroniser');
 
     Route::get('/activites', Activites::class)->name('activites');
+
+    Route::get('/documents', DocumentsDeCours::class)->name('documents');
+    Route::get('/documents/{document}/telecharger', TelechargementController::class)
+        ->name('documents.telecharger');
 
     Route::get('/demandes', DemandesDeModification::class)->name('demandes');
 
