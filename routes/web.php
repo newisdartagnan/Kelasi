@@ -3,6 +3,7 @@
 use App\Http\Controllers\ConnexionController;
 use App\Http\Controllers\SynchronisationController;
 use App\Livewire\ActiverMonCompte;
+use App\Livewire\DemandesDeModification;
 use App\Livewire\ImporterLesInscrits;
 use App\Livewire\JournalDesSeances;
 use App\Livewire\SaisirSeance;
@@ -29,6 +30,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/seances/journal', JournalDesSeances::class)->name('seances.journal');
 
     Route::post('/seances/synchroniser', SynchronisationController::class)->name('seances.synchroniser');
+
+    Route::get('/demandes', DemandesDeModification::class)->name('demandes');
 
     Route::get('/inscrits', ImporterLesInscrits::class)
         ->middleware('can:inscription.deposer')

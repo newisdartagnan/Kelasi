@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\DemandeModification;
 use App\Models\Seance;
 use App\Models\User;
 
@@ -33,6 +34,17 @@ final class Navigation
                 'icone' => '✓',
                 'pastille' => self::seancesAValider($utilisateur),
             ];
+        }
+
+        if ($utilisateur->can('demande.arbitrer')) {
+            $liens[] = [
+                'route' => 'demandes',
+                'libelle' => 'Demandes',
+                'icone' => '⇄',
+                'pastille' => DemandeModification::enAttente()->count(),
+            ];
+        } elseif ($utilisateur->can('demande.creer')) {
+            $liens[] = ['route' => 'demandes', 'libelle' => 'Demandes', 'icone' => '⇄'];
         }
 
         $liens[] = ['route' => 'seances.journal', 'libelle' => 'Journal', 'icone' => '☰'];
