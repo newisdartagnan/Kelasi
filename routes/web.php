@@ -9,6 +9,7 @@ use App\Livewire\DemandesDeModification;
 use App\Livewire\DocumentsDeCours;
 use App\Livewire\ImporterLesInscrits;
 use App\Livewire\JournalDesSeances;
+use App\Livewire\MessagerieInterne;
 use App\Livewire\SaisirSeance;
 use App\Livewire\SeancesAValider;
 use App\Livewire\TableauDeBord;
@@ -35,6 +36,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/seances/synchroniser', SynchronisationController::class)->name('seances.synchroniser');
 
     Route::get('/activites', Activites::class)->name('activites');
+
+    Route::get('/messages', MessagerieInterne::class)->name('messages');
 
     Route::get('/documents', DocumentsDeCours::class)->name('documents');
     Route::get('/documents/{document}/telecharger', TelechargementController::class)

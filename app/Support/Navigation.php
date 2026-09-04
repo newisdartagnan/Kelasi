@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\DemandeModification;
 use App\Models\Seance;
+use App\Services\Messagerie;
 use App\Models\User;
 
 /**
@@ -49,6 +50,13 @@ final class Navigation
         } elseif ($utilisateur->can('demande.creer')) {
             $liens[] = ['route' => 'demandes', 'libelle' => 'Demandes', 'icone' => '⇄'];
         }
+
+        $liens[] = [
+            'route' => 'messages',
+            'libelle' => 'Messages',
+            'icone' => '✉',
+            'pastille' => app(Messagerie::class)->nonLus($utilisateur),
+        ];
 
         $liens[] = ['route' => 'seances.journal', 'libelle' => 'Journal', 'icone' => '☰'];
 
