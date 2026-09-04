@@ -58,6 +58,13 @@ final class Navigation
             'pastille' => app(Messagerie::class)->nonLus($utilisateur),
         ];
 
+        $liens[] = [
+            'route' => 'notifications',
+            'libelle' => 'Rappels',
+            'icone' => '◔',
+            'pastille' => $utilisateur->unreadNotifications()->count(),
+        ];
+
         $liens[] = ['route' => 'seances.journal', 'libelle' => 'Journal', 'icone' => '☰'];
 
         if ($utilisateur->can('inscription.deposer')) {

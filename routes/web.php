@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\ConnexionController;
+use App\Http\Controllers\AbonnementPushController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\SynchronisationController;
 use App\Http\Controllers\TelechargementController;
 use App\Livewire\ActiverMonCompte;
 use App\Livewire\Activites;
+use App\Livewire\CentreDeNotifications;
 use App\Livewire\DemandesDeModification;
 use App\Livewire\DocumentsDeCours;
 use App\Livewire\ImporterLesInscrits;
@@ -41,6 +43,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/avancement/export', ExportController::class)->name('avancement.export');
 
     Route::get('/messages', MessagerieInterne::class)->name('messages');
+
+    Route::get('/notifications', CentreDeNotifications::class)->name('notifications');
+    Route::post('/notifications/abonnement', [AbonnementPushController::class, 'enregistrer'])
+        ->name('notifications.abonnement');
+    Route::post('/notifications/abonnement/retrait', [AbonnementPushController::class, 'retirer'])
+        ->name('notifications.abonnement.retrait');
 
     Route::get('/documents', DocumentsDeCours::class)->name('documents');
     Route::get('/documents/{document}/telecharger', TelechargementController::class)

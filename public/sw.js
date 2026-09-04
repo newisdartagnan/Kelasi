@@ -102,3 +102,52 @@ async function reseauDAbord(requete) {
         );
     }
 }
+
+/**
+ * La réception d'une notification poussée.
+ *
+ * Le tag regroupe les rappels d'une même journée : un second envoi remplace
+ * le premier sur l'écran verrouillé au lieu de s'empiler à côté.
+ */
+self.addEventListener('push', (evenement) => {
+    if (!evenement.data) return;
+
+    let charge;
+    try {
+        charge = evenement.data.json();
+    } catch {
+        charge = { titre: 'Kelasi', corps: evenement.data.text() };
+    }
+
+    evenement.waitUntil(
+        self.registration.showNotification(charge.titre ?? 'Kelasi', {
+            body: charge.corps ?? '',
+            icon: '/icones/icone-192.png',
+            badge: '/icones/icone-192.png',
+            lang: 'fr',
+            tag: charge.tag ?? 'kelasi-rappel',
+            renotify: true,
+            data: { url: charge.url ?? '/' },
+        }),
+    );
+});
+
+/** Un clic ramène sur l'onglet déjà ouvert plutôt que d'en ouvrir un second. */
+self.addEventListener('notificationclick', (evenement) => {
+    evenement.notification.close();
+
+    const cible = evenement.notification.data?.url ?? '/';
+
+    evenement.waitUntil(
+        self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((fenetres) => {
+            const ouverte = fenetres.find((f) => f.url.includes(self.location.origin));
+
+            if (ouverte) {
+                ouverte.navigate(cible);
+                return ouverte.focus();
+            }
+
+            return self.clients.openWindow(cible);
+        }),
+    );
+});
