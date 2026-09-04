@@ -91,6 +91,43 @@ celles que le secrétariat académique de l'établissement aura validées.
 - **L'avancement se lit par semestre.** Mélanger un premier semestre achevé
   avec un second à peine commencé donne un chiffre qui ne veut rien dire.
 
+## Ce que fait l'application
+
+| Écran | Ce qu'on y fait |
+|---|---|
+| **Avancement** | L'état des enseignements, à la maille de sa fonction : facultés pour le VDE, promotions pour un doyen, cours pour les autres. Export Excel pour qui peut. |
+| **Saisir** | Le chef de promotion enregistre la séance qui vient de se tenir, en ligne ou non. |
+| **À valider** | L'enseignant contresigne ou conteste. Sans sa signature, les heures ne comptent pas. |
+| **Demandes** | L'enseignant demande une modification du programme, le VDE tranche — et l'approbation applique réellement le changement. |
+| **Activités** | Examens, interrogations, visites guidées, conférences, avec la portée qui décide de qui les voit. |
+| **Documents** | Les supports déposés par les enseignants, servis sous contrôle d'accès. |
+| **Messages** | La messagerie interne, cadrée par la hiérarchie académique. |
+| **Rappels** | Les notifications reçues et le réglage du push sur l'appareil. |
+| **Journal** | Qui a saisi quoi, quel jour, contresigné par qui. |
+| **Inscrits** | Le secrétariat dépose la liste des matricules autorisés. |
+
+## Les rappels du matin
+
+Une commande, planifiée à six heures heure de Kinshasa les jours ouvrables :
+
+```bash
+php artisan kelasi:rappels
+```
+
+Une seule notification par personne, qui rassemble ce qui la concerne, et
+rien du tout quand il n'y a rien à dire. L'enseignant n'est prévenu que s'il
+a des contreseings en souffrance ; le chef de promotion, que s'il n'a rien
+saisi la veille — jamais le lundi, puisque le dimanche personne n'a
+enseigné ; l'alerte de retard ne va qu'aux autorités, qui peuvent y faire
+quelque chose.
+
+Pour le push web, générer une fois la paire de clés VAPID et la reporter
+dans `.env` :
+
+```bash
+php artisan kelasi:vapid
+```
+
 ## Le mode hors ligne
 
 La saisie part dans une file **IndexedDB** locale et remonte dès que la
@@ -172,10 +209,9 @@ crée pas de doublon.
 
 ## Ce qui reste à faire
 
-- Messagerie interne (les tables existent, l'interface non)
-- Dépôt et partage de documents par les enseignants
-- Activités : examens, interrogations, visites guidées
-- Demandes de modification du programme et arbitrage par le VDE
-- Notifications quotidiennes et push web
-- Export Excel de l'avancement pour le VDE
-- Import des listes d'inscrits par le secrétariat
+- Déploiement : PostgreSQL et Docker, en reprenant ceux du projet hospitalier
+- Suspension et réactivation des comptes par les doyens et le VDE
+- Réinitialisation de mot de passe approuvée par la hiérarchie
+- Conversations de groupe (les tables les prévoient, l'interface non)
+- Relevé de présence des étudiants, séance par séance
+- Clôture d'année académique et bascule vers la suivante

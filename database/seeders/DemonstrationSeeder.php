@@ -3,14 +3,18 @@
 namespace Database\Seeders;
 
 use App\Models\AnneeAcademique;
+use App\Models\Activite;
 use App\Models\Attribution;
 use App\Models\Cours;
+use App\Models\DemandeModification;
+use App\Models\Document;
 use App\Models\Faculte;
 use App\Models\InscriptionAutorisee;
 use App\Models\Local;
 use App\Models\Promotion;
 use App\Models\Seance;
 use App\Models\User;
+use App\Services\Messagerie;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -49,7 +53,9 @@ class DemonstrationSeeder extends Seeder
             $this->genererSeances($promotion, $chef);
         }
 
-        $this->command?->info("Comptes de demonstration crees. Mot de passe : ".self::MOT_DE_PASSE);
+        $this->animerLesEchanges($vde);
+
+        $this->command?->info("Comptes de démonstration créés. Mot de passe : ".self::MOT_DE_PASSE);
         $this->command?->info("VDE : {$vde->matricule}");
     }
 
@@ -232,6 +238,133 @@ class DemonstrationSeeder extends Seeder
         $chapitre = intdiv($minutesFaites, 120) + 1;
 
         return "Chapitre {$chapitre} : suite du programme de {$cours->intitule}.";
+    }
+
+    /**
+     * Ce qui gravite autour des séances : quelques demandes en instance, des
+     * activités annoncées, un support déposé et un échange entamé.
+     *
+     * Sans cela, cinq écrans sur huit s'ouvriraient vides et l'on ne pourrait
+     * pas juger de ce que l'application donne une fois en service.
+     */
+    private function animerLesEchanges(User $vde): void
+    {
+        if (DemandeModification::exists()) {
+            return;
+        }
+
+        foreach (Promotion::with('departement.faculte')->active()->get() as $promotion) {
+            $cours = Cours::with('attributions.enseignant')
+                ->whereHas('uniteEnseignement', fn ($q) => $q->where('promotion_id', $promotion->id))
+                ->get();
+
+            $this->deposerUneDemande($cours->first(), $promotion);
+            $this->annoncerDesActivites($promotion, $vde);
+            $this->partagerUnSupport($cours->skip(1)->first());
+        }
+
+        $this->entamerUneConversation();
+    }
+
+    private function deposerUneDemande(?Cours $cours, Promotion $promotion): void
+    {
+        $enseignant = $cours?->attributions->first()?->enseignant;
+
+        if (! $enseignant) {
+            return;
+        }
+
+        $vise = $cours->heures_cmi + 10;
+
+        DemandeModification::create([
+            'cours_id' => $cours->id,
+            'demandeur_id' => $enseignant->id,
+            'type' => 'volume',
+            'description' => "Porter le cours magistral de {$cours->heures_cmi} à {$vise} heures.",
+            'justification' => 'Le programme arrêté ne tient pas dans le volume actuel : '
+                .'les deux derniers chapitres sont systématiquement traités en accéléré.',
+            'modifications' => ['heures_cmi' => $vise],
+            'statut' => DemandeModification::STATUT_EN_ATTENTE,
+        ]);
+    }
+
+    private function annoncerDesActivites(Promotion $promotion, User $vde): void
+    {
+        $chef = $promotion->etudiants()->role(User::ROLE_CP)->first();
+        $local = Local::where('faculte_id', $promotion->departement->faculte_id)->first();
+
+        if ($chef) {
+            Activite::create([
+                'titre' => 'Interrogation générale du premier semestre',
+                'description' => 'Sur les chapitres traités depuis la rentrée.',
+                'type' => 'interrogation',
+                'portee' => Activite::PORTEE_PROMOTION,
+                'promotion_id' => $promotion->id,
+                'local_id' => $local?->id,
+                'debut' => now()->addDays(3)->setTime(8, 0),
+                'fin' => now()->addDays(3)->setTime(11, 0),
+                'statut' => 'planifiee',
+                'createur_id' => $chef->id,
+            ]);
+        }
+
+        Activite::firstOrCreate(
+            ['titre' => 'Conférence inaugurale du second semestre', 'portee' => Activite::PORTEE_UNIVERSITE],
+            [
+                'description' => 'Ouverte à toutes les facultés.',
+                'type' => 'conference',
+                'debut' => now()->addWeek()->setTime(10, 0),
+                'statut' => 'planifiee',
+                'createur_id' => $vde->id,
+            ],
+        );
+    }
+
+    private function partagerUnSupport(?Cours $cours): void
+    {
+        $enseignant = $cours?->attributions->first()?->enseignant;
+
+        if (! $enseignant) {
+            return;
+        }
+
+        // Le fichier n'existe pas sur le disque : la démonstration montre la
+        // fiche, pas le téléchargement.
+        Document::create([
+            'cours_id' => $cours->id,
+            'deposant_id' => $enseignant->id,
+            'titre' => "Syllabus — {$cours->intitule}",
+            'description' => 'Plan du cours et bibliographie indicative.',
+            'chemin' => "documents/cours-{$cours->id}/syllabus-demonstration.pdf",
+            'nom_original' => 'syllabus.pdf',
+            'mime' => 'application/pdf',
+            'taille' => 480_000,
+            'publie' => true,
+        ]);
+    }
+
+    private function entamerUneConversation(): void
+    {
+        $chef = User::role(User::ROLE_CP)->whereNotNull('promotion_id')->first();
+        $cours = $chef
+            ? Cours::with('attributions.enseignant')
+                ->whereHas('uniteEnseignement', fn ($q) => $q->where('promotion_id', $chef->promotion_id))
+                ->first()
+            : null;
+        $enseignant = $cours?->attributions->first()?->enseignant;
+
+        if (! $chef || ! $enseignant) {
+            return;
+        }
+
+        $messagerie = app(Messagerie::class);
+        $conversation = $messagerie->ouvrirAvec($chef, $enseignant);
+
+        $messagerie->envoyer($chef, $conversation,
+            "Bonjour professeur. La séance de mardi n'a pas encore été contresignée, "
+            ."pourriez-vous y jeter un œil ?");
+        $messagerie->envoyer($enseignant, $conversation,
+            'Bien reçu, je regarde cela ce soir.');
     }
 
     private function creerUtilisateur(string $matricule, string $nom, string $prenom, string $role): User

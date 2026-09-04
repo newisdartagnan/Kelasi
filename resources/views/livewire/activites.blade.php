@@ -180,7 +180,7 @@
                         @endif
                     </p>
 
-                    @if ($activite->statut === 'planifiee' && $peutAnnoncer)
+                    @if ($activite->statut === 'planifiee' && $gestion->peutAgirSur(auth()->user(), $activite))
                         <div class="mt-3 flex flex-wrap gap-2">
                             <button type="button" wire:click="modifier({{ $activite->id }})"
                                     class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50">

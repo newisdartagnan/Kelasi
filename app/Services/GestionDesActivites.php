@@ -183,6 +183,18 @@ class GestionDesActivites
      * Modifier ou clôturer une activité suppose de pouvoir l'annoncer : son
      * auteur, ou une autorité dont le mandat couvre sa portée.
      */
+    /** La même règle que verifierPouvoirSur, posée en question plutôt qu'en garde. */
+    public function peutAgirSur(User $auteur, Activite $activite): bool
+    {
+        try {
+            $this->verifierPouvoirSur($auteur, $activite);
+
+            return true;
+        } catch (ValidationException) {
+            return false;
+        }
+    }
+
     private function verifierPouvoirSur(User $auteur, Activite $activite): void
     {
         if ($activite->createur_id === $auteur->id) {

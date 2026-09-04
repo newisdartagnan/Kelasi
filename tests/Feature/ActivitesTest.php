@@ -218,6 +218,25 @@ class ActivitesTest extends TestCase
         $this->assertSame('cloturee', $activite->fresh()->statut);
     }
 
+    /**
+     * Le bouton ne doit pas s'afficher là où l'action serait refusée : un
+     * chef de promotion voit la conférence du vice-recteur, mais n'a rien à
+     * y faire.
+     */
+    public function test_le_chef_ne_peut_pas_agir_sur_une_activite_universitaire(): void
+    {
+        $conference = $this->gestion->creer($this->vde, $this->donnees([
+            'titre' => 'Conférence inaugurale',
+            'portee' => Activite::PORTEE_UNIVERSITE,
+        ]));
+
+        $sienne = $this->gestion->creer($this->chef, $this->donnees(['portee' => Activite::PORTEE_PROMOTION]));
+
+        $this->assertFalse($this->gestion->peutAgirSur($this->chef, $conference));
+        $this->assertTrue($this->gestion->peutAgirSur($this->chef, $sienne));
+        $this->assertTrue($this->gestion->peutAgirSur($this->doyen, $sienne));
+    }
+
     public function test_l_ecran_s_ouvre(): void
     {
         $this->actingAs($this->chef)->get('/activites')->assertOk()->assertSee('Activités');

@@ -181,6 +181,7 @@ class Activites extends Component
 
         return view('livewire.activites', [
             'activites' => $this->calendrier(),
+            'gestion' => $gestion,
             'portees' => $portees,
             'peutAnnoncer' => $portees !== [],
             'types' => Activite::TYPES,

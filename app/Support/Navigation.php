@@ -4,19 +4,26 @@ namespace App\Support;
 
 use App\Models\DemandeModification;
 use App\Models\Seance;
-use App\Services\Messagerie;
 use App\Models\User;
+use App\Services\Messagerie;
 
 /**
- * Ce que chaque role voit dans la barre de navigation.
+ * Ce que chaque rôle voit dans la barre de navigation.
  *
- * L'application ne montre pas les memes ecrans a tout le monde : un chef de
+ * L'application ne montre pas les mêmes écrans à tout le monde : un chef de
  * promotion vient pour saisir, un enseignant pour contresigner, un doyen pour
- * lire. La navigation le dit d'emblee plutot que de proposer a chacun des
- * pages qui lui seront refusees.
+ * lire. La navigation le dit d'emblée plutôt que de proposer à chacun des
+ * pages qui lui seront refusées.
+ *
+ * Les entrées portent un rang. Sur téléphone, seules les quatre premières
+ * tiennent dans la barre du bas : au-delà, les libellés se touchent et
+ * deviennent illisibles. Le reste passe derrière un bouton « Plus ».
  */
 final class Navigation
 {
+    /** Nombre d'entrées que la barre du bas peut porter sans se tasser. */
+    public const PLACES_EN_BAS = 4;
+
     /** @return list<array{route: string, libelle: string, icone: string, pastille?: int}> */
     public static function pour(User $utilisateur): array
     {
@@ -24,6 +31,8 @@ final class Navigation
             ['route' => 'tableau-de-bord', 'libelle' => 'Avancement', 'icone' => '◴'],
         ];
 
+        // L'action quotidienne du rôle vient en deuxième : c'est celle pour
+        // laquelle la personne ouvre l'application.
         if ($utilisateur->estChefDePromotion()) {
             $liens[] = ['route' => 'seances.saisir', 'libelle' => 'Saisir', 'icone' => '✎'];
         }
@@ -37,9 +46,6 @@ final class Navigation
             ];
         }
 
-        $liens[] = ['route' => 'activites', 'libelle' => 'Activités', 'icone' => '◈'];
-        $liens[] = ['route' => 'documents', 'libelle' => 'Documents', 'icone' => '⎙'];
-
         if ($utilisateur->can('demande.arbitrer')) {
             $liens[] = [
                 'route' => 'demandes',
@@ -47,8 +53,6 @@ final class Navigation
                 'icone' => '⇄',
                 'pastille' => DemandeModification::enAttente()->count(),
             ];
-        } elseif ($utilisateur->can('demande.creer')) {
-            $liens[] = ['route' => 'demandes', 'libelle' => 'Demandes', 'icone' => '⇄'];
         }
 
         $liens[] = [
@@ -65,6 +69,13 @@ final class Navigation
             'pastille' => $utilisateur->unreadNotifications()->count(),
         ];
 
+        $liens[] = ['route' => 'activites', 'libelle' => 'Activités', 'icone' => '◈'];
+        $liens[] = ['route' => 'documents', 'libelle' => 'Documents', 'icone' => '⎙'];
+
+        if (! $utilisateur->can('demande.arbitrer') && $utilisateur->can('demande.creer')) {
+            $liens[] = ['route' => 'demandes', 'libelle' => 'Demandes', 'icone' => '⇄'];
+        }
+
         $liens[] = ['route' => 'seances.journal', 'libelle' => 'Journal', 'icone' => '☰'];
 
         if ($utilisateur->can('inscription.deposer')) {
@@ -74,7 +85,51 @@ final class Navigation
         return $liens;
     }
 
-    /** Le nombre de seances qui attendent le contreseing de cet enseignant. */
+    /**
+     * Les entrées de la barre du bas. Un écran ouvert qui n'y figure pas y
+     * prend la dernière place : sinon rien n'indiquerait où l'on se trouve.
+     *
+     * @return list<array{route: string, libelle: string, icone: string, pastille?: int}>
+     */
+    public static function principales(User $utilisateur, ?string $routeCourante = null): array
+    {
+        $tous = self::pour($utilisateur);
+        $retenus = array_slice($tous, 0, self::PLACES_EN_BAS);
+
+        if ($routeCourante && ! collect($retenus)->contains('route', $routeCourante)) {
+            $courant = collect($tous)->firstWhere('route', $routeCourante);
+
+            if ($courant) {
+                $retenus[self::PLACES_EN_BAS - 1] = $courant;
+            }
+        }
+
+        return $retenus;
+    }
+
+    /**
+     * Ce qui passe derrière le bouton « Plus ».
+     *
+     * @return list<array{route: string, libelle: string, icone: string, pastille?: int}>
+     */
+    public static function secondaires(User $utilisateur, ?string $routeCourante = null): array
+    {
+        $principales = collect(self::principales($utilisateur, $routeCourante))->pluck('route');
+
+        return collect(self::pour($utilisateur))
+            ->reject(fn (array $lien) => $principales->contains($lien['route']))
+            ->values()
+            ->all();
+    }
+
+    /** Le nombre total d'éléments en attente derrière le bouton « Plus ». */
+    public static function pastilleSecondaire(User $utilisateur, ?string $routeCourante = null): int
+    {
+        return collect(self::secondaires($utilisateur, $routeCourante))
+            ->sum(fn (array $lien) => $lien['pastille'] ?? 0);
+    }
+
+    /** Le nombre de séances qui attendent le contreseing de cet enseignant. */
     private static function seancesAValider(User $enseignant): int
     {
         return Seance::enAttente()
