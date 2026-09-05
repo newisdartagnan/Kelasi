@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 /**
@@ -50,7 +51,7 @@ class Seance extends Model
         'matiere_couverte', 'observations', 'effectif_present',
         'statut', 'saisie_par_id', 'soumise_at',
         'validee_par_id', 'validee_at', 'motif_contestation',
-        'source', 'saisie_locale_at',
+        'source', 'saisie_locale_at', 'appel_fait_at',
     ];
 
     protected function casts(): array
@@ -60,6 +61,7 @@ class Seance extends Model
             'soumise_at' => 'datetime',
             'validee_at' => 'datetime',
             'saisie_locale_at' => 'datetime',
+            'appel_fait_at' => 'datetime',
         ];
     }
 
@@ -83,6 +85,16 @@ class Seance extends Model
     public function local(): BelongsTo
     {
         return $this->belongsTo(Local::class);
+    }
+
+    public function presences(): HasMany
+    {
+        return $this->hasMany(Presence::class);
+    }
+
+    public function appelFait(): bool
+    {
+        return $this->appel_fait_at !== null;
     }
 
     public function saisiePar(): BelongsTo

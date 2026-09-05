@@ -7,11 +7,13 @@ use App\Http\Controllers\SynchronisationController;
 use App\Http\Controllers\TelechargementController;
 use App\Livewire\ActiverMonCompte;
 use App\Livewire\Activites;
+use App\Livewire\Assiduite;
 use App\Livewire\CentreDeNotifications;
 use App\Livewire\ChangerMonMotDePasse;
 use App\Livewire\DemanderUnMotDePasse;
 use App\Livewire\DemandesDeModification;
 use App\Livewire\DocumentsDeCours;
+use App\Livewire\FaireLAppel;
 use App\Livewire\GestionDesComptes;
 use App\Livewire\ImporterLesInscrits;
 use App\Livewire\JournalDesSeances;
@@ -39,6 +41,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/seances/saisir', SaisirSeance::class)->name('seances.saisir');
     Route::get('/seances/a-valider', SeancesAValider::class)->name('seances.a-valider');
     Route::get('/seances/journal', JournalDesSeances::class)->name('seances.journal');
+    Route::get('/seances/{seance}/appel', FaireLAppel::class)->name('seances.appel');
+
+    Route::get('/assiduite', Assiduite::class)->name('assiduite');
 
     Route::post('/seances/synchroniser', SynchronisationController::class)->name('seances.synchroniser');
 

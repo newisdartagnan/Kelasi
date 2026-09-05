@@ -72,6 +72,7 @@ final class Navigation
 
         $liens[] = ['route' => 'activites', 'libelle' => 'Activités', 'icone' => '◈'];
         $liens[] = ['route' => 'documents', 'libelle' => 'Documents', 'icone' => '⎙'];
+        $liens[] = ['route' => 'assiduite', 'libelle' => 'Assiduité', 'icone' => '◑'];
 
         if (! $utilisateur->can('demande.arbitrer') && $utilisateur->can('demande.creer')) {
             $liens[] = ['route' => 'demandes', 'libelle' => 'Demandes', 'icone' => '⇄'];

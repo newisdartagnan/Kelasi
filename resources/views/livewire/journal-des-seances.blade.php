@@ -51,6 +51,15 @@
                         @endif
                     </p>
 
+                    @if (auth()->user()->estChefDePromotion() && $seance->promotion_id === auth()->user()->promotion_id)
+                        <a href="{{ route('seances.appel', $seance) }}"
+                           class="mt-2 inline-block text-xs font-medium text-kelasi-600 hover:underline">
+                            {{ $seance->appelFait()
+                                ? "Corriger l'appel · {$seance->effectif_present} présents"
+                                : "Faire l'appel" }}
+                        </a>
+                    @endif
+
                     @if ($seance->motif_contestation)
                         <p class="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">
                             Contestation : {{ $seance->motif_contestation }}
