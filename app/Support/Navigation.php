@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\DemandeModification;
+use App\Models\DemandeReinitialisation;
 use App\Models\Seance;
 use App\Models\User;
 use App\Services\Messagerie;
@@ -77,6 +78,15 @@ final class Navigation
         }
 
         $liens[] = ['route' => 'seances.journal', 'libelle' => 'Journal', 'icone' => '☰'];
+
+        if ($utilisateur->can('utilisateur.designer.cp')) {
+            $liens[] = [
+                'route' => 'comptes',
+                'libelle' => 'Comptes',
+                'icone' => '☖',
+                'pastille' => DemandeReinitialisation::enAttente()->count(),
+            ];
+        }
 
         if ($utilisateur->can('inscription.deposer')) {
             $liens[] = ['route' => 'inscrits', 'libelle' => 'Inscrits', 'icone' => '☷'];

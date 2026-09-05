@@ -69,7 +69,13 @@
         </div>
     </form>
 
-    <p class="mt-6 text-center text-sm text-slate-600">
+    <p class="mt-4 text-center text-sm">
+        <a href="{{ route('mot-de-passe-oublie') }}" class="text-slate-500 hover:underline">
+            Mot de passe oublié
+        </a>
+    </p>
+
+    <p class="mt-4 text-center text-sm text-slate-600">
         Premier accès ?
         <a href="{{ route('activation') }}" class="font-medium text-kelasi-600 hover:underline">
             Ouvrir mon compte

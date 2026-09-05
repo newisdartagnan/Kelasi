@@ -38,7 +38,8 @@ class User extends Authenticatable
     protected $fillable = [
         'matricule', 'name', 'postnom', 'prenom', 'email', 'password',
         'telephone', 'photo', 'faculte_id', 'departement_id', 'promotion_id',
-        'actif', 'suspendu_at', 'suspendu_par_id', 'motif_suspension',
+        'actif', 'doit_changer_motdepasse',
+        'suspendu_at', 'suspendu_par_id', 'motif_suspension',
         'derniere_connexion_at',
     ];
 
@@ -50,6 +51,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'actif' => 'boolean',
+            'doit_changer_motdepasse' => 'boolean',
             'suspendu_at' => 'datetime',
             'derniere_connexion_at' => 'datetime',
         ];

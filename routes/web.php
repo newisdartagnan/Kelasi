@@ -8,8 +8,11 @@ use App\Http\Controllers\TelechargementController;
 use App\Livewire\ActiverMonCompte;
 use App\Livewire\Activites;
 use App\Livewire\CentreDeNotifications;
+use App\Livewire\ChangerMonMotDePasse;
+use App\Livewire\DemanderUnMotDePasse;
 use App\Livewire\DemandesDeModification;
 use App\Livewire\DocumentsDeCours;
+use App\Livewire\GestionDesComptes;
 use App\Livewire\ImporterLesInscrits;
 use App\Livewire\JournalDesSeances;
 use App\Livewire\MessagerieInterne;
@@ -26,6 +29,7 @@ Route::middleware('guest')->group(function () {
 
     // On n'ouvre pas un compte, on active une ligne déposée par le secrétariat.
     Route::get('/activation', ActiverMonCompte::class)->name('activation');
+    Route::get('/mot-de-passe-oublie', DemanderUnMotDePasse::class)->name('mot-de-passe-oublie');
 });
 
 Route::middleware('auth')->group(function () {
@@ -55,6 +59,12 @@ Route::middleware('auth')->group(function () {
         ->name('documents.telecharger');
 
     Route::get('/demandes', DemandesDeModification::class)->name('demandes');
+
+    Route::get('/mot-de-passe', ChangerMonMotDePasse::class)->name('mot-de-passe');
+
+    Route::get('/comptes', GestionDesComptes::class)
+        ->middleware('can:utilisateur.designer.cp')
+        ->name('comptes');
 
     Route::get('/inscrits', ImporterLesInscrits::class)
         ->middleware('can:inscription.deposer')
