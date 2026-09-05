@@ -9,6 +9,7 @@ use App\Livewire\ActiverMonCompte;
 use App\Livewire\Activites;
 use App\Livewire\Assiduite;
 use App\Livewire\CentreDeNotifications;
+use App\Livewire\CloturerLAnnee;
 use App\Livewire\ChangerMonMotDePasse;
 use App\Livewire\DemanderUnMotDePasse;
 use App\Livewire\DemandesDeModification;
@@ -70,6 +71,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/comptes', GestionDesComptes::class)
         ->middleware('can:utilisateur.designer.cp')
         ->name('comptes');
+
+    Route::get('/annees', CloturerLAnnee::class)
+        ->middleware('can:programme.modifier')
+        ->name('annees');
 
     Route::get('/inscrits', ImporterLesInscrits::class)
         ->middleware('can:inscription.deposer')

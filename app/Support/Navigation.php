@@ -93,6 +93,10 @@ final class Navigation
             $liens[] = ['route' => 'inscrits', 'libelle' => 'Inscrits', 'icone' => '☷'];
         }
 
+        if ($utilisateur->can('programme.modifier')) {
+            $liens[] = ['route' => 'annees', 'libelle' => 'Année', 'icone' => '⌛'];
+        }
+
         return $liens;
     }
 

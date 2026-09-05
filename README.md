@@ -103,8 +103,11 @@ celles que le secrétariat académique de l'établissement aura validées.
 | **Documents** | Les supports déposés par les enseignants, servis sous contrôle d'accès. |
 | **Messages** | La messagerie interne, cadrée par la hiérarchie académique. |
 | **Rappels** | Les notifications reçues et le réglage du push sur l'appareil. |
-| **Journal** | Qui a saisi quoi, quel jour, contresigné par qui. |
+| **Assiduité** | Le taux de présence par étudiant, du plus faible au plus élevé. |
+| **Journal** | Qui a saisi quoi, quel jour, contresigné par qui — et l'appel de chaque séance. |
+| **Comptes** | Suspendre, réactiver, désigner un chef, remettre un mot de passe. |
 | **Inscrits** | Le secrétariat dépose la liste des matricules autorisés. |
+| **Année** | Clôturer l'année en cours et ouvrir la suivante. |
 
 ## Les rappels du matin
 
@@ -127,6 +130,47 @@ dans `.env` :
 ```bash
 php artisan kelasi:vapid
 ```
+
+## Le relevé de présence
+
+L'assiduité conditionne l'accès aux examens : le relevé est donc nominatif,
+et l'effectif de la séance en découle plutôt que de le contredire. Trois
+règles le gouvernent :
+
+- un **retard compte comme une présence** — l'étudiant a suivi la séance ;
+- une séance **dont l'appel n'a pas été fait** ne pèse pas au dénominateur :
+  la compter pénaliserait l'étudiant pour un oubli qui n'est pas le sien ;
+- un étudiant **sans aucun relevé** n'est pas classé comme le plus absent,
+  mais renvoyé en fin de liste : il est inconnu, pas décrocheur.
+
+## Les mots de passe
+
+Aucun lien n'est envoyé par courriel. Beaucoup d'étudiants et de chefs de
+promotion n'ont pas d'adresse, et le réseau ne permet pas d'y compter : la
+demande remonte à l'autorité, qui remet un mot de passe provisoire de la main
+à la main.
+
+Ce provisoire n'est jamais stocké en clair — il est affiché une seule fois à
+qui l'approuve — et évite les caractères `I`, `l`, `O` et `0`, qui se
+confondent quand on le dicte. Tant que la personne ne l'a pas remplacé, un
+middleware la ramène à l'écran qui lui en fait choisir un.
+
+## La clôture d'année
+
+Elle se fait en deux temps : un aperçu qu'on lit — combien de promotions
+reconduites, lesquelles s'arrêtent, ce qui reste en attente — puis une
+confirmation.
+
+Rien n'est détruit : l'année close reste consultable, ses séances, ses
+relevés et ses documents intacts. Le programme est recopié dans les
+promotions reconduites, attributions d'enseignants comprises.
+
+Deux garde-fous. Des **séances en attente de contreseing bloquent la
+clôture** : les figer reviendrait à perdre définitivement les heures
+correspondantes. Et le **passage des étudiants au niveau supérieur ne se fait
+pas ici** — il dépend des délibérations, qui n'ont pas leur place dans cette
+application. Le secrétariat dépose la nouvelle liste, et chacun rejoint la
+promotion que le jury lui a assignée.
 
 ## Le mode hors ligne
 
@@ -255,8 +299,7 @@ crée pas de doublon.
 
 ## Ce qui reste à faire
 
-- Suspension et réactivation des comptes par les doyens et le VDE
-- Réinitialisation de mot de passe approuvée par la hiérarchie
-- Conversations de groupe (les tables les prévoient, l'interface non)
-- Relevé de présence des étudiants, séance par séance
-- Clôture d'année académique et bascule vers la suivante
+- Notes et délibérations, si l'université souhaite les rapatrier ici
+- Emploi du temps prévisionnel, en regard des séances réellement tenues
+- Statistiques par enseignant : volume assuré, régularité des contreseings
+- Export PDF des relevés de présence, pour les jurys qui les exigent signés

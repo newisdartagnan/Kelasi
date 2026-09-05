@@ -77,9 +77,15 @@ class DemonstrationSeeder extends Seeder
             return $annee;
         }
 
+        $debut = now()->copy()->subMonths(6)->startOfMonth();
+        $fin = now()->copy()->addMonths(4)->endOfMonth();
+
         $annee->update([
-            'date_debut' => now()->copy()->subMonths(6)->startOfMonth()->toDateString(),
-            'date_fin' => now()->copy()->addMonths(4)->endOfMonth()->toDateString(),
+            'date_debut' => $debut->toDateString(),
+            'date_fin' => $fin->toDateString(),
+            // Le libellé suit les dates : les laisser se contredire ferait
+            // proposer une année suivante fausse à l'écran de clôture.
+            'libelle' => $debut->year.'-'.($debut->year + 1),
         ]);
 
         return $annee->refresh();
