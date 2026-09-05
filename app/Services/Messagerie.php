@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Models\Conversation;
+use App\Models\Cours;
 use App\Models\Message;
+use App\Models\Promotion;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -72,6 +74,85 @@ class Messagerie
 
             return $conversation;
         });
+    }
+
+    /**
+     * Ouvre le fil d'une promotion, ou retrouve celui qui existe.
+     *
+     * Un fil de promotion réunit ses étudiants, ses chefs et les enseignants
+     * qui y sont attribués. Les participants sont ajoutés à l'ouverture puis
+     * réajustés à chaque envoi : une promotion gagne des inscrits en cours
+     * d'année, et un fil figé les laisserait dehors.
+     */
+    public function ouvrirFilDePromotion(User $auteur, Promotion $promotion): Conversation
+    {
+        $this->verifierAppartenance($auteur, $promotion);
+
+        $conversation = Conversation::firstOrCreate(
+            ['type' => 'promotion', 'promotion_id' => $promotion->id],
+            ['sujet' => $promotion->nom_complet, 'createur_id' => $auteur->id],
+        );
+
+        $this->ajusterParticipants($conversation, $this->membresDePromotion($promotion));
+
+        return $conversation;
+    }
+
+    /** Le fil d'un cours : ses enseignants et la promotion qui le suit. */
+    public function ouvrirFilDeCours(User $auteur, Cours $cours): Conversation
+    {
+        $promotion = $cours->uniteEnseignement->promotion;
+
+        $this->verifierAppartenance($auteur, $promotion, $cours);
+
+        $conversation = Conversation::firstOrCreate(
+            ['type' => 'cours', 'cours_id' => $cours->id],
+            [
+                'sujet' => $cours->intitule,
+                'promotion_id' => $promotion->id,
+                'createur_id' => $auteur->id,
+            ],
+        );
+
+        $this->ajusterParticipants($conversation, $this->membresDePromotion($promotion));
+
+        return $conversation;
+    }
+
+    /**
+     * Les fils de groupe auxquels l'utilisateur a droit, qu'ils existent déjà
+     * ou non : on propose d'ouvrir plutôt que d'exiger que quelqu'un l'ait
+     * fait avant.
+     *
+     * @return Collection<int, array{type: string, cle: int, libelle: string, detail: string}>
+     */
+    public function filsDeGroupePossibles(User $utilisateur): Collection
+    {
+        $promotions = $this->promotionsDe($utilisateur);
+
+        if ($promotions->isEmpty()) {
+            return collect();
+        }
+
+        $fils = $promotions->map(fn (Promotion $p) => [
+            'type' => 'promotion',
+            'cle' => $p->id,
+            'libelle' => $p->nom_complet,
+            'detail' => 'Toute la promotion',
+        ]);
+
+        $cours = $utilisateur->hasRole(User::ROLE_ENSEIGNANT)
+            ? $utilisateur->coursEnseignes()->with('uniteEnseignement.promotion')->get()
+            : Cours::with('uniteEnseignement.promotion')
+                ->whereHas('uniteEnseignement', fn (Builder $q) => $q->whereIn('promotion_id', $promotions->pluck('id')))
+                ->get();
+
+        return $fils->concat($cours->map(fn (Cours $c) => [
+            'type' => 'cours',
+            'cle' => $c->id,
+            'libelle' => $c->intitule,
+            'detail' => $c->uniteEnseignement->promotion->nom_complet,
+        ]))->values();
     }
 
     public function envoyer(User $auteur, Conversation $conversation, string $corps): Message
@@ -189,6 +270,94 @@ class Messagerie
         return $requete->where(fn (Builder $q) => $q
             ->whereIn('faculte_id', $facultes)
             ->orWhereNull('faculte_id'));
+    }
+
+    /**
+     * Les membres d'un fil de promotion : ses inscrits et les enseignants
+     * attribués à ses cours.
+     *
+     * @return Collection<int, int>
+     */
+    private function membresDePromotion(Promotion $promotion): Collection
+    {
+        $inscrits = User::actifs()->where('promotion_id', $promotion->id)->pluck('id');
+
+        $enseignants = User::actifs()
+            ->whereHas(
+                'coursEnseignes.uniteEnseignement',
+                fn (Builder $q) => $q->where('promotion_id', $promotion->id),
+            )
+            ->pluck('id');
+
+        return $inscrits->concat($enseignants)->unique()->values();
+    }
+
+    /**
+     * Ajoute les membres qui manquent sans toucher aux autres : réécrire la
+     * liste entière effacerait les marqueurs de lecture de chacun.
+     *
+     * @param  Collection<int, int>  $membres
+     */
+    private function ajusterParticipants(Conversation $conversation, Collection $membres): void
+    {
+        $deja = $conversation->participants()->pluck('user_id');
+        $manquants = $membres->diff($deja);
+
+        if ($manquants->isEmpty()) {
+            return;
+        }
+
+        $conversation->participants()->createMany(
+            $manquants->map(fn (int $id) => ['user_id' => $id])->all(),
+        );
+    }
+
+    /** @return Collection<int, Promotion> */
+    private function promotionsDe(User $utilisateur): Collection
+    {
+        if ($utilisateur->promotion_id) {
+            return Promotion::whereKey($utilisateur->promotion_id)->with('departement')->get();
+        }
+
+        if ($utilisateur->hasRole(User::ROLE_ENSEIGNANT)) {
+            return Promotion::with('departement')
+                ->whereHas(
+                    'unitesEnseignement.cours.attributions',
+                    fn (Builder $q) => $q->where('user_id', $utilisateur->id),
+                )
+                ->get();
+        }
+
+        if ($utilisateur->estAutoriteFacultaire()) {
+            return Promotion::with('departement')
+                ->whereHas('departement', fn (Builder $q) => $q->where('faculte_id', $utilisateur->faculte_id))
+                ->active()
+                ->get();
+        }
+
+        return $utilisateur->aPorteeUniversitaire()
+            ? Promotion::with('departement')->active()->get()
+            : collect();
+    }
+
+    /**
+     * On n'écrit pas dans le fil d'une promotion à laquelle on n'appartient
+     * pas -- ni comme inscrit, ni comme enseignant, ni comme autorité de sa
+     * faculté.
+     */
+    private function verifierAppartenance(User $utilisateur, Promotion $promotion, ?Cours $cours = null): void
+    {
+        if ($cours && $cours->attributions()->where('user_id', $utilisateur->id)->exists()) {
+            return;
+        }
+
+        if ($this->promotionsDe($utilisateur)->contains('id', $promotion->id)) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            'conversation' => 'Vous n\'appartenez pas à cette promotion.',
+        ]);
     }
 
     /** @return list<string> */

@@ -3,6 +3,8 @@
 namespace App\Livewire;
 
 use App\Models\Conversation;
+use App\Models\Cours;
+use App\Models\Promotion;
 use App\Models\User;
 use App\Services\Messagerie;
 use Illuminate\Support\Collection;
@@ -49,6 +51,32 @@ class MessagerieInterne extends Component
     public function ouvrirRecherche(): void
     {
         $this->rechercheOuverte = true;
+        $this->recherche = '';
+    }
+
+    public function ouvrirGroupe(string $type, int $cle, Messagerie $messagerie): void
+    {
+        try {
+            $conversation = match ($type) {
+                'promotion' => $messagerie->ouvrirFilDePromotion(auth()->user(), Promotion::findOrFail($cle)),
+                'cours' => $messagerie->ouvrirFilDeCours(
+                    auth()->user(),
+                    Cours::with('uniteEnseignement.promotion')->findOrFail($cle),
+                ),
+                default => null,
+            };
+        } catch (ValidationException $e) {
+            session()->flash('erreur', collect($e->errors())->flatten()->first());
+
+            return;
+        }
+
+        if (! $conversation) {
+            return;
+        }
+
+        $this->conversationId = $conversation->id;
+        $this->rechercheOuverte = false;
         $this->recherche = '';
     }
 
@@ -114,6 +142,15 @@ class MessagerieInterne extends Component
                 : collect(),
             'destinataires' => $this->rechercheOuverte
                 ? $messagerie->destinatairesPossibles($utilisateur, $this->recherche)
+                : collect(),
+            'groupes' => $this->rechercheOuverte
+                ? $messagerie->filsDeGroupePossibles($utilisateur)->when(
+                    $this->recherche !== '',
+                    fn ($fils) => $fils->filter(fn (array $f) => str_contains(
+                        mb_strtolower($f['libelle']),
+                        mb_strtolower($this->recherche),
+                    ))->values(),
+                )
                 : collect(),
         ]);
     }

@@ -27,11 +27,35 @@
                 class="mt-1 w-full rounded-lg border-slate-300 px-3 py-2.5 shadow-sm focus:border-kelasi-500 focus:ring-kelasi-500"
             >
 
+            @if ($groupes->isNotEmpty())
+                <p class="mt-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Fils de groupe</p>
+                <ul class="mt-1 max-h-52 space-y-1 overflow-y-auto">
+                    @foreach ($groupes as $groupe)
+                        <li>
+                            <button
+                                type="button"
+                                wire:click="ouvrirGroupe('{{ $groupe['type'] }}', {{ $groupe['cle'] }})"
+                                class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition hover:bg-slate-100"
+                            >
+                                <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-kelasi-100 text-sm">
+                                    {{ $groupe['type'] === 'promotion' ? '👥' : '📘' }}
+                                </span>
+                                <span class="min-w-0">
+                                    <span class="block truncate text-sm font-medium">{{ $groupe['libelle'] }}</span>
+                                    <span class="block truncate text-xs text-slate-500">{{ $groupe['detail'] }}</span>
+                                </span>
+                            </button>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+
             @if ($destinataires->isEmpty())
                 <p class="mt-3 text-sm text-slate-500">
                     Personne ne correspond dans les interlocuteurs que votre fonction autorise.
                 </p>
             @else
+                <p class="mt-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Personnes</p>
                 <ul class="mt-3 max-h-72 space-y-1 overflow-y-auto">
                     @foreach ($destinataires as $destinataire)
                         <li>
@@ -74,10 +98,7 @@
             @else
                 <ul class="divide-y divide-slate-100">
                     @foreach ($conversations as $fil)
-                        @php
-                            $autre = $fil->interlocuteur(auth()->user());
-                            $dernier = $fil->messages->first();
-                        @endphp
+                        @php($dernier = $fil->messages->first())
                         <li>
                             <button
                                 type="button"
@@ -88,12 +109,16 @@
                                     'hover:bg-slate-50' => $conversation?->id !== $fil->id,
                                 ])
                             >
-                                <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-200 text-xs font-semibold text-slate-700">
-                                    {{ $autre?->initiales ?? '··' }}
+                                <span @class([
+                                    'grid h-9 w-9 shrink-0 place-items-center rounded-full text-xs font-semibold',
+                                    'bg-kelasi-100 text-base' => $fil->estDeGroupe(),
+                                    'bg-slate-200 text-slate-700' => ! $fil->estDeGroupe(),
+                                ])>
+                                    {{ $fil->vignettePour(auth()->user()) }}
                                 </span>
                                 <span class="min-w-0 flex-1">
                                     <span class="block truncate text-sm font-medium">
-                                        {{ $autre?->nom_complet ?? 'Conversation' }}
+                                        {{ $fil->titrePour(auth()->user()) }}
                                     </span>
                                     @if ($dernier)
                                         <span class="block truncate text-xs text-slate-500">{{ $dernier->corps }}</span>
@@ -124,13 +149,21 @@
                             class="rounded-lg px-2 py-1 text-sm text-slate-500 hover:bg-slate-100 md:hidden">
                         &larr;
                     </button>
-                    <span class="grid h-9 w-9 place-items-center rounded-full bg-slate-200 text-xs font-semibold text-slate-700">
-                        {{ $autre?->initiales ?? '··' }}
+                    <span @class([
+                        'grid h-9 w-9 place-items-center rounded-full text-xs font-semibold',
+                        'bg-kelasi-100 text-base' => $conversation->estDeGroupe(),
+                        'bg-slate-200 text-slate-700' => ! $conversation->estDeGroupe(),
+                    ])>
+                        {{ $conversation->vignettePour(auth()->user()) }}
                     </span>
                     <span class="min-w-0">
-                        <span class="block truncate font-medium">{{ $autre?->nom_complet ?? 'Conversation' }}</span>
+                        <span class="block truncate font-medium">{{ $conversation->titrePour(auth()->user()) }}</span>
                         <span class="block truncate text-xs text-slate-500">
-                            {{ $autre ? (\App\Models\User::ROLES[$autre->getRoleNames()->first()] ?? '') : '' }}
+                            @if ($conversation->estDeGroupe())
+                                {{ $conversation->membres->count() }} participants
+                            @elseif ($autre)
+                                {{ \App\Models\User::ROLES[$autre->getRoleNames()->first()] ?? '' }}
+                            @endif
                         </span>
                     </span>
                 </header>
@@ -144,6 +177,9 @@
                                 'bg-kelasi-600 text-white' => $aMoi,
                                 'bg-slate-100 text-slate-800' => ! $aMoi,
                             ])>
+                                @if ($conversation->estDeGroupe() && ! $aMoi)
+                                    <p class="text-xs font-semibold text-kelasi-700">{{ $message->auteur->nom_complet }}</p>
+                                @endif
                                 <p class="whitespace-pre-line text-sm leading-relaxed">{{ $message->corps }}</p>
                                 <p @class([
                                     'mt-1 text-[11px]',

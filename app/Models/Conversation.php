@@ -66,4 +66,30 @@ class Conversation extends Model
     {
         return $this->membres->firstWhere('id', '!=', $utilisateur->id);
     }
+
+    public function estDeGroupe(): bool
+    {
+        return $this->type !== 'directe';
+    }
+
+    /**
+     * Le nom du fil tel qu'il apparaît dans la liste : l'interlocuteur pour
+     * un tête-à-tête, le sujet pour un groupe.
+     */
+    public function titrePour(User $utilisateur): string
+    {
+        if ($this->estDeGroupe()) {
+            return $this->sujet ?? 'Conversation';
+        }
+
+        return $this->interlocuteur($utilisateur)?->nom_complet ?? 'Conversation';
+    }
+
+    /** Deux lettres pour la pastille : les initiales, ou le pictogramme du groupe. */
+    public function vignettePour(User $utilisateur): string
+    {
+        return $this->estDeGroupe()
+            ? '👥'
+            : ($this->interlocuteur($utilisateur)?->initiales ?? '··');
+    }
 }
