@@ -1,4 +1,4 @@
-FROM php:8.3-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 # Les extensions nécessaires à l'application : PostgreSQL, les exports Excel
 # (zip, gd), l'internationalisation pour les dates en français, et opcache.

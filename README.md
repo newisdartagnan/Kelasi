@@ -205,7 +205,9 @@ doyen en erreur : mieux vaut une page plus lente qu'un chiffre faux. Les
 Reprise de celle déjà en production sur le projet hospitalier, pour que
 l'équipe n'ait ni nouvel outillage ni nouvelle exploitation à apprendre.
 
-- **Laravel 12** / PHP 8.3+
+- **Laravel 12** / **PHP 8.4** — la version est fixée dans `composer.json`
+  (`config.platform`) et dans le `Dockerfile` : les deux doivent concorder,
+  faute de quoi le verrou de dépendances refuse de s'installer
 - **Livewire 3**, Alpine, **Tailwind 4**, Vite
 - **PostgreSQL 16**, en production comme en test
 - **Redis** pour le cache, les sessions et la file
@@ -215,14 +217,33 @@ l'équipe n'ait ni nouvel outillage ni nouvelle exploitation à apprendre.
 
 ## Déploiement
 
+Sous Linux ou macOS :
+
 ```bash
 cp .env.example .env
-# renseigner DB_PASSWORD, et les ports si ceux par défaut sont pris
-docker compose run --rm app php artisan key:generate
+# remplacer DB_PASSWORD
 ./deploy.sh
 ```
 
-L'application écoute sur le port **8090**, Adminer sur **8091**, et la base
+Sous Windows, dans PowerShell — les `.sh` ne s'y exécutent pas :
+
+```powershell
+Copy-Item .env.example .env
+# remplacer DB_PASSWORD
+.\deploy.ps1
+```
+
+Les deux scripts construisent les images, génèrent la clé d'application,
+démarrent les services, attendent la base et appliquent les migrations. Ils se
+relancent sans crainte.
+
+**Le fichier `.env` doit se trouver à la racine, à côté de
+`docker-compose.yml`.** Il sert deux fois : `docker compose` y lit les ports et
+le mot de passe de la base, l'application y lit sa configuration. Sans lui,
+`docker compose` avertit que chaque variable est vide et PostgreSQL refuse de
+démarrer.
+
+L'application écoute sur le port **8093**, Adminer sur **8094**, et la base
 est publiée sur **5434** pour pgAdmin ou DBeaver. Ces ports sortent des
 valeurs habituelles à dessein : sous Windows, 80, 443 et 5432 sont souvent
 déjà pris — par IIS, les plages Hyper-V ou un PostgreSQL local — et le
