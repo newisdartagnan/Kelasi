@@ -41,6 +41,12 @@ RUN npm ci && npm run build \
     && chmod -R 777 storage bootstrap/cache \
     && chown -R www-data:www-data /var/www
 
+# Une copie intacte du public/ construit. Le répertoire servi est un volume
+# partagé avec nginx : au premier démarrage il est vide, et une fois rempli il
+# ne se rafraîchirait plus tout seul après une reconstruction. L'entrypoint le
+# resynchronise depuis ce modèle à chaque démarrage.
+RUN cp -R /var/www/public /var/www/public-modele
+
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 

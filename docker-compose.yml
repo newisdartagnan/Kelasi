@@ -34,7 +34,10 @@ services:
       # Le stockage et les sauvegardes survivent à une reconstruction d'image ;
       # les supports de cours déposés vivent dans storage/.
       - ./storage:/var/www/storage
-      - ./public:/var/www/public
+      # public/ n'est pas monté depuis l'hôte : les fichiers construits par
+      # Vite vivent dans l'image, et un montage les recouvrirait de la version
+      # du dépôt -- où public/build est justement ignoré par git.
+      - public:/var/www/public
       - ./backups:/backups
     depends_on:
       db:
@@ -49,7 +52,8 @@ services:
       - "${KELASI_HTTP_PORT:-8093}:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./public:/var/www/public:ro
+      # nginx sert exactement les mêmes fichiers que PHP-FPM exécute.
+      - public:/var/www/public:ro
     depends_on:
       - app
 
@@ -157,3 +161,4 @@ services:
 volumes:
   pgdata:
   redisdata:
+  public:
