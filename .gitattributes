@@ -1,5 +1,14 @@
 * text=auto eol=lf
 
+# Un docker-entrypoint.sh en fins de ligne Windows donne « /bin/sh^M: bad
+# interpreter » et le conteneur ne démarre pas. La règle générale ci-dessus
+# suffit, mais on la rend explicite : elle ne doit pas se perdre.
+*.sh text eol=lf
+
+# PowerShell lit un .ps1 dans la page de codes ANSI faute de marque d'octets.
+# Le fichier en porte une ; ici on fige au moins ses fins de ligne.
+*.ps1 text eol=crlf
+
 *.blade.php diff=html
 *.css diff=css
 *.html diff=html

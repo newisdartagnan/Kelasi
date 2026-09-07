@@ -1,4 +1,4 @@
-# Déploiement de Kelasi sous Windows.
+﻿# Déploiement de Kelasi sous Windows.
 #
 # Équivalent de deploy.sh, que PowerShell ne sait pas exécuter. Comme lui, il
 # est fait pour être relancé sans crainte : chaque étape est soit idempotente,
