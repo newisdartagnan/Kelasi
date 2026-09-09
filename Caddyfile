@@ -1,0 +1,46 @@
+# Kelasi — la terminaison HTTPS.
+#
+# Pourquoi elle n'est pas facultative une fois l'application sur téléphone :
+# hors de « localhost », un navigateur refuse d'enregistrer un service worker
+# sur une origine non sécurisée. Sans service worker, pas de mode hors ligne,
+# pas de notification poussée, et surtout aucune proposition d'installation :
+# Kelasi reste un site que l'on visite, jamais une application que l'on pose
+# sur son écran d'accueil.
+#
+# Caddy ne sert rien lui-même : il termine le TLS et repasse la requête à
+# nginx, qui reste seul responsable des fichiers et de PHP. Le chemin en HTTP
+# simple continue donc de fonctionner exactement comme avant.
+
+{$KELASI_DOMAINE:localhost} {
+	encode zstd gzip
+
+	# Le certificat est obtenu et renouvelé tout seul :
+	#
+	#   - pour un domaine public, auprès de Let's Encrypt. Le domaine doit
+	#     pointer sur cette machine et les ports 80 et 443 lui parvenir ;
+	#   - pour « localhost », avec une autorité locale que Caddy installe.
+	#
+	# Pour un serveur interne à l'université, injoignable depuis Internet,
+	# deux voies : ouvrir le port 80 le temps de la validation, ou remplacer
+	# la ligne ci-dessous par le certificat de l'université :
+	#
+	#     tls /etc/caddy/kelasi.crt /etc/caddy/kelasi.key
+	#
+	# Un certificat auto-signé ne convient pas : les téléphones le refusent,
+	# et le service worker avec lui.
+
+	# Une fois le site connu en HTTPS, le navigateur n'y revient plus en
+	# clair : un mot de passe d'enseignant ne repartira pas sur le réseau
+	# de l'université faute d'un « s » oublié dans l'adresse.
+	#
+	# Sauf sur « localhost » : l'en-tête y vaudrait pour TOUT ce que la
+	# machine sert en local, pendant un an, et rendrait la mise au point de
+	# n'importe quel autre projet en HTTP simple impossible.
+	@vrai_domaine not host localhost
+	header @vrai_domaine Strict-Transport-Security "max-age=31536000"
+
+	# Caddy pose lui-même X-Forwarded-Proto ; c'est ce que l'application lit
+	# pour savoir qu'elle est servie en HTTPS et fabriquer ses URL en
+	# conséquence. Voir config/kelasi.php, « mandataires ».
+	reverse_proxy nginx:80
+}

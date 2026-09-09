@@ -30,7 +30,7 @@
             x-show="plusOuvert"
             x-transition
             x-cloak
-            class="fixed inset-x-0 bottom-[3.75rem] z-40 mx-3 rounded-2xl border border-slate-200 bg-white p-2 shadow-lg"
+            class="fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom))] z-40 mx-3 rounded-2xl border border-slate-200 bg-white p-2 shadow-lg"
             aria-label="Autres écrans"
         >
             @foreach ($secondaires as $lien)

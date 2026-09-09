@@ -1,0 +1,7 @@
+# Ce que Capacitor fabrique. Le projet Xcode se régénère depuis le modèle et
+# le domaine : rien de ce qui est ici ne mérite d'être versionné.
+capacitor.config.json
+contenu-local/
+ios/
+node_modules/
+package-lock.json

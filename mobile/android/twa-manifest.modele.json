@@ -1,0 +1,50 @@
+{
+    "packageId": "cd.kelasi.app",
+    "host": "DOMAINE",
+    "name": "Kelasi - Suivi des enseignements",
+    "launcherName": "Kelasi",
+    "display": "standalone",
+    "orientation": "portrait",
+    "themeColor": "#1e3a8a",
+    "themeColorDark": "#1e3a8a",
+    "navigationColor": "#1e3a8a",
+    "navigationColorDark": "#1e3a8a",
+    "navigationDividerColor": "#1e3a8a",
+    "navigationDividerColorDark": "#1e3a8a",
+    "backgroundColor": "#f8fafc",
+    "enableNotifications": true,
+    "startUrl": "/",
+    "iconUrl": "https://DOMAINE/icones/icone-512.png",
+    "maskableIconUrl": "https://DOMAINE/icones/icone-maskable-512.png",
+    "webManifestUrl": "https://DOMAINE/manifest.json",
+    "splashScreenFadeOutDuration": 300,
+    "appVersionName": "1.0.0",
+    "appVersionCode": 1,
+    "shortcuts": [
+        {
+            "name": "Saisir une séance",
+            "short_name": "Saisir",
+            "url": "/seances/saisir",
+            "chosenIconUrl": "https://DOMAINE/icones/icone-192.png"
+        },
+        {
+            "name": "Séances à valider",
+            "short_name": "Valider",
+            "url": "/seances/a-valider",
+            "chosenIconUrl": "https://DOMAINE/icones/icone-192.png"
+        }
+    ],
+    "signingKey": {
+        "path": "./android.keystore",
+        "alias": "kelasi"
+    },
+    "appVersion": "1.0.0",
+    "generatorApp": "bubblewrap-cli",
+    "fallbackType": "customtabs",
+    "enableSiteSettingsShortcut": true,
+    "isChromeOSOnly": false,
+    "isMetaQuest": false,
+    "fullScopeUrl": "https://DOMAINE/",
+    "minSdkVersion": 23,
+    "features": {}
+}

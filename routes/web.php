@@ -3,6 +3,7 @@
 use App\Http\Controllers\ConnexionController;
 use App\Http\Controllers\AbonnementPushController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\LiensDApplicationController;
 use App\Http\Controllers\SynchronisationController;
 use App\Http\Controllers\TelechargementController;
 use App\Livewire\ActiverMonCompte;
@@ -25,6 +26,11 @@ use App\Livewire\TableauDeBord;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/hors-ligne', 'hors-ligne')->name('hors-ligne');
+
+// Lu par Chrome au premier lancement de l'application Android, sans session :
+// il doit rester accessible aux visiteurs non connectés.
+Route::get('/.well-known/assetlinks.json', LiensDApplicationController::class)
+    ->name('android.liens');
 
 Route::middleware('guest')->group(function () {
     Route::get('/connexion', [ConnexionController::class, 'formulaire'])->name('connexion');

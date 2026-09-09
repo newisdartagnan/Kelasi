@@ -1,0 +1,11 @@
+{
+    "name": "kelasi-ios",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Enveloppe iOS de Kelasi. Ne contient pas l'application : elle ouvre le serveur.",
+    "devDependencies": {
+        "@capacitor/cli": "^7.0.0",
+        "@capacitor/core": "^7.0.0",
+        "@capacitor/ios": "^7.0.0"
+    }
+}

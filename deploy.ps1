@@ -38,8 +38,17 @@ if ($config -match '(?m)^DB_PASSWORD=kelasi-changez-ce-mot-de-passe') {
 # La construction vient avant tout le reste : sans image, la génération de la
 # clé échouerait sur un message qui n'aurait rien à voir avec la cause.
 
+# Un domaine déclaré veut dire HTTPS : Caddy se place devant nginx et obtient
+# le certificat. Ce n'est pas un luxe -- hors de « localhost », un navigateur
+# refuse d'enregistrer un service worker sur une origine en clair, et aucun
+# téléphone ne proposera d'installer Kelasi.
+$domaine = if ($config -match '(?m)^KELASI_DOMAINE=(\S+)') { $Matches[1] } else { '' }
+$profils = if ($domaine -and $domaine -ne 'localhost') { @('--profile', 'https') } else { @() }
+
+if ($profils.Count -gt 0) { Etape "Domaine déclaré : $domaine - le service HTTPS sera démarré" }
+
 Etape 'Construction des images'
-docker compose build
+docker compose @profils build
 if ($LASTEXITCODE -ne 0) { Echec "La construction a échoué. La sortie ci-dessus en donne la raison." }
 
 # --- 3. Clé d'application --------------------------------------------------
@@ -54,7 +63,7 @@ if ($config -notmatch '(?m)^APP_KEY=base64:') {
 # --- 4. Services -----------------------------------------------------------
 
 Etape 'Démarrage des services'
-docker compose up -d
+docker compose @profils up -d
 if ($LASTEXITCODE -ne 0) { Echec "Le démarrage a échoué. Voyez : docker compose logs" }
 
 Etape 'Attente de la base'
@@ -87,7 +96,13 @@ $port    = if ($config -match '(?m)^KELASI_HTTP_PORT=(\d+)')    { $Matches[1] } 
 $adminer = if ($config -match '(?m)^KELASI_ADMINER_PORT=(\d+)') { $Matches[1] } else { '8094' }
 
 Write-Host ''
-Write-Host "Kelasi est en ligne sur http://localhost:$port" -ForegroundColor Green
+if ($profils.Count -gt 0) {
+    Write-Host "Kelasi est en ligne sur https://$domaine" -ForegroundColor Green
+    Write-Host "Le certificat peut demander une minute au premier démarrage : docker compose logs caddy"
+} else {
+    Write-Host "Kelasi est en ligne sur http://localhost:$port" -ForegroundColor Green
+    Write-Host "Sans domaine ni HTTPS, l'application ne s'installera sur aucun téléphone. Voir mobile/README.md."
+}
 Write-Host "Adminer : http://localhost:$adminer"
 Write-Host ''
 Write-Host "Pour installer le jeu de démonstration (efface les données existantes) :" -ForegroundColor Gray

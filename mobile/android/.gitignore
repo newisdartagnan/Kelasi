@@ -1,0 +1,22 @@
+# Ce que Bubblewrap fabrique : le projet Android complet, régénérable à tout
+# moment depuis le modèle et le domaine.
+twa-manifest.json
+app/
+gradle/
+gradlew
+gradlew.bat
+build.gradle
+settings.gradle
+gradle.properties
+local.properties
+store_icon.png
+*.apk
+*.aab
+*.idsig
+
+# La clé de signature ne se met JAMAIS dans le dépôt : qui la détient peut
+# publier une mise à jour de Kelasi sur les téléphones de l'université. Elle
+# se garde hors ligne, avec son mot de passe, et se perd une seule fois --
+# après quoi l'application ne peut plus être mise à jour, jamais.
+*.keystore
+*.jks

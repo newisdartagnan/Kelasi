@@ -1,0 +1,14 @@
+{
+    "appId": "cd.kelasi.app",
+    "appName": "Kelasi",
+    "webDir": "contenu-local",
+    "server": {
+        "url": "https://DOMAINE",
+        "cleartext": false
+    },
+    "ios": {
+        "contentInset": "always",
+        "backgroundColor": "#f8fafc",
+        "limitsNavigationsToAppBoundDomains": true
+    }
+}

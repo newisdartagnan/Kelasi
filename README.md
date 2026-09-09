@@ -183,17 +183,29 @@ Le serveur traite chaque ligne du lot pour elle-même et répond en trois
 listes — `acceptees`, `ignorees`, `refusees` — pour que le client sache
 exactement ce qu'il peut retirer de sa file.
 
-## La PWA
+## Sur les téléphones
 
-Installable sur Android et sur iOS, à partir d'une seule base de code qui
-sert aussi le poste de bureau des doyens.
+Une seule base de code sert le téléphone du chef de promotion et le poste de
+bureau du doyen. Posée sur l'écran d'accueil, elle s'ouvre en plein écran,
+garde la session, fonctionne hors connexion et reçoit les rappels du matin.
 
-- **Android / Chrome** : installation complète, invite automatique.
-- **iOS / Safari 16.4+** : installation manuelle (Partager → Sur l'écran
-  d'accueil). Il n'existe pas d'invite automatique, et le push web n'y
-  fonctionne qu'une fois l'application installée. Pas de Background Sync :
-  c'est pourquoi la synchronisation se déclenche à l'événement `online` et au
+L'application propose elle-même l'installation, une fois, et se tait un mois
+si on l'écarte :
+
+- **Android / Chrome** : le navigateur signale l'application installable,
+  la bande affiche un bouton, le système fait le reste.
+- **iOS / Safari 16.4+** : aucun événement d'installation n'existe. La bande
+  décrit les deux gestes — *Partager*, puis *Sur l'écran d'accueil*. Le push
+  web n'y fonctionne **qu'une fois l'application installée** ; dans un onglet
+  Safari, aucun rappel n'arrive. Pas de Background Sync non plus : c'est
+  pourquoi la synchronisation se déclenche à l'événement `online` et au
   chargement, jamais en tâche de fond.
+
+**Rien de tout cela ne marche sans HTTPS.** Hors de `localhost`, un navigateur
+refuse d'enregistrer un service worker sur une origine en clair : pas de mode
+hors ligne, pas de notification, aucune proposition d'installation. Voir plus
+bas, et `mobile/README.md` pour la publication dans les magasins
+d'applications.
 
 Le service worker sert les fichiers statiques depuis le cache, mais demande
 toujours **les pages au réseau d'abord**. Un avancement périmé induirait un
@@ -251,13 +263,38 @@ démarrage échoue alors sur un « bind: access permissions » peu parlant.
 Chacun se règle par variable dans `.env`.
 
 Six services : l'application en PHP-FPM, nginx, PostgreSQL 16, Redis, un
-ordonnanceur et un ouvrier de file. Les deux derniers ne sont pas
+ordonnanceur et un ouvrier de file. Un septième, Caddy, se joint à eux quand
+un domaine est déclaré — voir *HTTPS* plus bas. Les deux derniers ne sont pas
 décoratifs — sans l'ordonnanceur les rappels du matin ne partent jamais,
 sans l'ouvrier les notifications s'empilent sans être envoyées.
 
 `./deploy.sh` se relance sans crainte : il refuse de démarrer sans clé
 d'application ni mot de passe de base plutôt que de laisser une installation
 à moitié faite.
+
+### HTTPS
+
+```bash
+# .env
+KELASI_DOMAINE=kelasi.unikin.ac.cd     # doit pointer sur cette machine
+APP_URL=https://kelasi.unikin.ac.cd
+
+./deploy.sh                            # le profil HTTPS démarre de lui-même
+```
+
+Un domaine déclaré suffit : les scripts de déploiement montent alors Caddy
+devant nginx, qui obtient et renouvelle seul le certificat. Les ports 80 et
+443 doivent parvenir à la machine — le 443 pour le service, le 80 pour la
+validation et la redirection.
+
+Un serveur interne, injoignable depuis Internet, ne peut pas obtenir de
+certificat public : il faut alors celui de l'université, déclaré dans
+`Caddyfile`. Un certificat auto-signé ne convient pas — les téléphones le
+refusent, et le service worker avec lui.
+
+L'application ne croit les en-têtes de mandataire que derrière les adresses
+privées (`config/kelasi.php`). Un visiteur venu d'Internet ne peut donc pas
+prétendre arriver en HTTPS.
 
 ### Sauvegardes
 
@@ -324,3 +361,7 @@ crée pas de doublon.
 - Emploi du temps prévisionnel, en regard des séances réellement tenues
 - Statistiques par enseignant : volume assuré, régularité des contreseings
 - Export PDF des relevés de présence, pour les jurys qui les exigent signés
+- La publication dans les magasins d'applications est préparée mais pas
+  faite : elle demande un domaine public, un compte Play Console, et pour
+  iOS un Mac et un compte Apple Developer. Voir `mobile/README.md`, qui dit
+  aussi ce qu'elle coûterait et ce qu'elle ferait perdre sur iPhone.

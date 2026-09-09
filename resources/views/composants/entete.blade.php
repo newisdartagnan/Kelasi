@@ -1,6 +1,9 @@
 @php($utilisateur = auth()->user())
 
-<header class="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+{{-- La marge haute vaut zéro dans un navigateur et la hauteur de l'encoche
+     une fois l'application installée sur iPhone : sans elle, le logo passe
+     sous l'heure. --}}
+<header class="sticky top-0 z-30 border-b border-slate-200 bg-white/95 pt-[env(safe-area-inset-top)] backdrop-blur">
     <div class="mx-auto flex w-full max-w-6xl items-center gap-4 px-4 py-3">
         <a href="{{ route('tableau-de-bord') }}" class="flex items-center gap-2.5">
             <span class="grid h-9 w-9 place-items-center rounded-lg bg-kelasi-600 text-lg font-bold text-white">K</span>
@@ -8,7 +11,7 @@
         </a>
 
         {{-- Le bandeau hors ligne : discret quand tout va bien, franc quand la file se remplit. --}}
-        <div x-data="etatDeConnexion()" x-cloak class="flex-1">
+        <div x-data="etatDeConnexion()" x-cloak class="min-w-0 flex-1">
             <p
                 x-show="!enLigne || file > 0"
                 class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium"
@@ -21,12 +24,15 @@
         </div>
 
         @if ($utilisateur)
-            <nav class="hidden items-center gap-1 md:flex">
+            {{-- Un doyen a dix entrées : sur un portable, elles ne tiennent pas
+                 toutes. Elles défilent alors horizontalement plutôt que de
+                 pousser le nom et la déconnexion hors de l'écran. --}}
+            <nav class="hidden min-w-0 items-center gap-0.5 overflow-x-auto md:flex [&::-webkit-scrollbar]:hidden" style="scrollbar-width: none">
                 @foreach (navigationDe($utilisateur) as $lien)
                     <a
                         href="{{ route($lien['route']) }}"
                         @class([
-                            'rounded-lg px-3 py-2 text-sm font-medium transition',
+                            'shrink-0 rounded-lg px-2.5 py-2 text-sm font-medium transition',
                             'bg-kelasi-50 text-kelasi-700' => request()->routeIs($lien['route']),
                             'text-slate-600 hover:bg-slate-100' => ! request()->routeIs($lien['route']),
                         ])
@@ -44,12 +50,12 @@
                 <button
                     type="submit"
                     class="flex items-center gap-2 rounded-lg py-1.5 pl-2 pr-1 text-left transition hover:bg-slate-100"
-                    title="Se déconnecter"
+                    title="{{ $utilisateur->nom_complet }} — se déconnecter"
                 >
                     <span class="grid h-8 w-8 place-items-center rounded-full bg-slate-200 text-xs font-semibold text-slate-700">
                         {{ $utilisateur->initiales }}
                     </span>
-                    <span class="hidden text-xs leading-tight sm:block">
+                    <span class="hidden text-xs leading-tight xl:block">
                         <span class="block font-medium">{{ $utilisateur->nom_complet }}</span>
                         <span class="block text-slate-500">
                             {{ \App\Models\User::ROLES[$utilisateur->getRoleNames()->first()] ?? '' }}

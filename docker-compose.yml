@@ -57,6 +57,32 @@ services:
     depends_on:
       - app
 
+  # HTTPS, à la demande : « docker compose --profile https up -d ».
+  #
+  # Hors « localhost », un navigateur n'enregistre pas de service worker sur
+  # une origine en clair : sans ce service, Kelasi reste un site que l'on
+  # visite, jamais une application que l'on installe. Le profil le laisse
+  # néanmoins facultatif -- une machine d'essai n'a pas de domaine.
+  caddy:
+    image: caddy:2-alpine
+    profiles: ["https"]
+    restart: unless-stopped
+    ports:
+      # Le port 80 sert la redirection et la validation du certificat ; il
+      # n'est pas décoratif, Let's Encrypt passe par lui.
+      - "${KELASI_HTTP_CLAIR_PORT:-80}:80"
+      - "${KELASI_HTTPS_PORT:-443}:443"
+    environment:
+      KELASI_DOMAINE: ${KELASI_DOMAINE:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Les certificats survivent au redémarrage : sans ce volume, chaque
+      # « up » en redemanderait un, et Let's Encrypt limite les demandes.
+      - caddydata:/data
+      - caddyconfig:/config
+    depends_on:
+      - nginx
+
   db:
     image: postgres:16-alpine
     restart: unless-stopped
@@ -162,3 +188,5 @@ volumes:
   pgdata:
   redisdata:
   public:
+  caddydata:
+  caddyconfig:

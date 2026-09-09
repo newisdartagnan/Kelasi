@@ -1,16 +1,23 @@
 {
+    "id": "/",
     "name": "Kelasi - Suivi des enseignements",
     "short_name": "Kelasi",
-    "description": "Le suivi du deroulement des cours, faculte par faculte et promotion par promotion.",
+    "description": "Le suivi du déroulement des cours, faculté par faculté et promotion par promotion.",
     "lang": "fr",
     "dir": "ltr",
     "start_url": "/",
     "scope": "/",
     "display": "standalone",
+    "display_override": ["standalone", "minimal-ui"],
     "orientation": "portrait-primary",
     "background_color": "#f8fafc",
     "theme_color": "#1e3a8a",
     "categories": ["education", "productivity"],
+    "launch_handler": {
+        "client_mode": "navigate-existing"
+    },
+    "prefer_related_applications": false,
+    "related_applications": [],
     "icons": [
         {
             "src": "/icones/icone-192.png",
@@ -29,6 +36,22 @@
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/icones/apercu-telephone.png",
+            "sizes": "412x915",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "L'avancement des cours d'une promotion"
+        },
+        {
+            "src": "/icones/apercu-bureau.png",
+            "sizes": "1280x800",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Le tableau de bord d'une faculté"
         }
     ],
     "shortcuts": [

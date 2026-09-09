@@ -11,7 +11,10 @@
     <meta name="theme-color" content="#1e3a8a">
     <link rel="apple-touch-icon" href="/icones/apple-touch-icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    {{-- « default » et non « black-translucent » : l'interface est claire, et
+         une barre d'état en texte blanc par-dessus un en-tête blanc rendrait
+         l'heure et la batterie illisibles. --}}
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Kelasi">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -19,7 +22,7 @@
 </head>
 <body class="h-full bg-slate-50 text-slate-900 antialiased">
 
-<div class="min-h-full pb-20 md:pb-0">
+<div class="min-h-full pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
     @include('composants.entete')
 
     <main class="mx-auto w-full max-w-6xl px-4 py-6">
@@ -34,6 +37,8 @@
                 {{ session('erreur') }}
             </div>
         @endif
+
+        @include('composants.invite-installation')
 
         @yield('contenu')
         {{ $slot ?? '' }}

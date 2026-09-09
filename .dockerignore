@@ -18,3 +18,7 @@ database/*.sqlite
 .phpunit.cache
 tests
 capture.mjs
+
+# Les enveloppes Android et iOS se construisent sur le poste du développeur,
+# jamais dans l'image du serveur.
+mobile

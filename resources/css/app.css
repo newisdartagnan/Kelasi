@@ -5,6 +5,14 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+/* Alpine retire cet attribut à son démarrage. Sans la règle, tout ce qui est
+   marqué « x-cloak » -- le bandeau hors ligne, le panneau « Plus », l'invite
+   d'installation -- clignote au chargement, d'autant plus longtemps que la
+   connexion est lente. C'est-à-dire précisément là où ça se voit. */
+[x-cloak] {
+    display: none !important;
+}
+
 @theme {
     --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 
