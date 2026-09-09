@@ -276,11 +276,18 @@ d'application ni mot de passe de base plutôt que de laisser une installation
 
 ```bash
 # .env
-KELASI_DOMAINE=kelasi.unikin.ac.cd     # doit pointer sur cette machine
-APP_URL=https://kelasi.unikin.ac.cd
+KELASI_DOMAINE=kelasi.mon-universite.cd     # exemple : mettre VOTRE domaine
+APP_URL=https://kelasi.mon-universite.cd
 
 ./deploy.sh                            # le profil HTTPS démarre de lui-même
 ```
+
+Le domaine doit être un nom que l'université possède et qui **pointe sur la
+machine où tourne Kelasi** — une entrée DNS de type A, créée par
+l'administrateur du domaine. Tant qu'elle n'existe pas, l'adresse ne mène nulle
+part, quel que soit l'état du serveur. Pour essayer l'installation sur un
+téléphone en attendant, sans domaine ni certificat public, voir
+`mobile/README.md`.
 
 Un domaine déclaré suffit : les scripts de déploiement montent alors Caddy
 devant nginx, qui obtient et renouvelle seul le certificat. Les ports 80 et

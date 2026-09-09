@@ -37,11 +37,17 @@ Le certificat est automatique :
 
 ```sh
 # .env
-KELASI_DOMAINE=kelasi.unikin.ac.cd     # doit pointer sur cette machine
-APP_URL=https://kelasi.unikin.ac.cd
+KELASI_DOMAINE=kelasi.mon-universite.cd     # exemple : mettre VOTRE domaine
+APP_URL=https://kelasi.mon-universite.cd
 
 docker compose --profile https up -d
 ```
+
+`kelasi.mon-universite.cd` n'est qu'un exemple. Le domaine doit être un nom que
+l'université possède et qui **pointe sur la machine où tourne Kelasi** : une
+entrée DNS de type A, créée par l'administrateur du domaine de l'université, ou
+un nom acheté pour l'occasion. Tant que cette entrée n'existe pas, l'adresse ne
+mène nulle part, quel que soit l'état du serveur.
 
 Les ports 80 et 443 doivent parvenir à la machine : le 443 pour le service, le
 80 pour la validation du certificat et la redirection. Un serveur interne,
@@ -52,8 +58,62 @@ alors celui de l'université, déclaré dans `Caddyfile` :
 tls /etc/caddy/kelasi.crt /etc/caddy/kelasi.key
 ```
 
-Un certificat auto-signé ne convient pas : les téléphones le refusent, et le
-service worker avec lui.
+---
+
+## Essayer sur son téléphone, sans domaine
+
+Attendre une entrée DNS pour voir à quoi ressemble l'installation serait
+dommage. Deux chemins existent, tout de suite, sur le réseau local.
+
+### Android, par le câble — cinq minutes, rien à installer
+
+Chrome sait faire passer un port du téléphone vers l'ordinateur. Comme le
+téléphone voit alors l'application sur `localhost`, qui est toujours considéré
+comme une origine sûre, **tout fonctionne sans le moindre certificat** :
+service worker, installation, mode hors ligne.
+
+1. sur le téléphone : *Paramètres › Options pour les développeurs › Débogage
+   USB* ;
+2. brancher le câble, accepter l'autorisation qui s'affiche ;
+3. sur l'ordinateur, dans Chrome : `chrome://inspect/#devices`, cocher
+   **Port forwarding**, ajouter `8093` → `localhost:8093` ;
+4. sur le téléphone, ouvrir `http://localhost:8093`.
+
+L'invite d'installation apparaît comme elle le fera en production.
+
+### Android et iPhone, par le Wi-Fi — avec le certificat de Caddy
+
+Sans câble, il faut un certificat, et donc faire reconnaître au téléphone
+l'autorité que Caddy fabrique lui-même. Caddy s'en charge dès qu'on lui donne
+une adresse IP plutôt qu'un domaine :
+
+```sh
+# .env — l'adresse de l'ordinateur sur le réseau local
+KELASI_DOMAINE=192.168.1.20
+APP_URL=https://192.168.1.20
+
+docker compose --profile https up -d
+```
+
+Reste à extraire l'autorité et à la porter sur le téléphone :
+
+```sh
+docker compose cp caddy:/data/caddy/pki/authorities/local/root.crt kelasi-ca.crt
+```
+
+- **Android** : *Paramètres › Sécurité › Chiffrement et identifiants ›
+  Installer un certificat › Certificat CA*.
+- **iPhone** : envoyer le fichier au téléphone, l'ouvrir pour installer le
+  profil, puis — c'est l'étape qu'on oublie — *Réglages › Général ›
+  Informations › Réglages des certificats de confiance* et activer la
+  confiance. Sans elle, Safari refuse toujours.
+
+Ce chemin sert à essayer, pas à mettre en service : chaque téléphone de
+l'université devrait recevoir ce certificat à la main. Pour la mise en service,
+il faut un vrai domaine.
+
+Un certificat auto-signé sans autorité reconnue, lui, ne convient dans aucun
+cas : les téléphones le refusent, et le service worker avec lui.
 
 ---
 
@@ -91,7 +151,7 @@ Il faut un compte Play Console (25 $, une fois) et le domaine servi en HTTPS.
 
 ```sh
 cd mobile/android
-./preparer.sh kelasi.unikin.ac.cd
+./preparer.sh kelasi.mon-universite.cd
 
 npx @bubblewrap/cli@latest build
 npx @bubblewrap/cli@latest fingerprint list
@@ -125,7 +185,7 @@ doivent être reconnues.
 Le fichier se vérifie d'un coup d'œil :
 
 ```sh
-curl https://kelasi.unikin.ac.cd/.well-known/assetlinks.json
+curl https://kelasi.mon-universite.cd/.well-known/assetlinks.json
 ```
 
 ---
@@ -169,7 +229,7 @@ Si le choix est fait malgré tout, le nécessaire est ici :
 
 ```sh
 cd mobile/ios
-./preparer.sh kelasi.unikin.ac.cd
+./preparer.sh kelasi.mon-universite.cd
 npx cap open ios
 ```
 

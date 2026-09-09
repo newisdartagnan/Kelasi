@@ -1,7 +1,7 @@
 #!/bin/sh
 # Prépare l'enveloppe iOS. À lancer sur un Mac, Xcode installé.
 #
-#   ./preparer.sh kelasi.unikin.ac.cd
+#   ./preparer.sh kelasi.mon-universite.cd
 #
 # Lire mobile/README.md avant : sur iPhone, cette enveloppe fait PERDRE les
 # notifications poussées, que l'installation depuis Safari, elle, conserve.
@@ -11,7 +11,7 @@ set -eu
 DOMAINE="${1:-}"
 
 if [ -z "$DOMAINE" ]; then
-    echo "Usage : ./preparer.sh <domaine>            (ex. kelasi.unikin.ac.cd)" >&2
+    echo "Usage : ./preparer.sh <domaine>            (ex. kelasi.mon-universite.cd)" >&2
     echo "Le domaine doit être servi en HTTPS." >&2
     exit 1
 fi

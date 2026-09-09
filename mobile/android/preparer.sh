@@ -6,14 +6,14 @@
 # sont toujours les mêmes et se retapent mal. Ce script les inscrit une fois
 # pour toutes dans twa-manifest.json ; il reste à signer et à construire.
 #
-#   ./preparer.sh kelasi.unikin.ac.cd
+#   ./preparer.sh kelasi.mon-universite.cd
 
 set -eu
 
 DOMAINE="${1:-}"
 
 if [ -z "$DOMAINE" ]; then
-    echo "Usage : ./preparer.sh <domaine>            (ex. kelasi.unikin.ac.cd)" >&2
+    echo "Usage : ./preparer.sh <domaine>            (ex. kelasi.mon-universite.cd)" >&2
     echo "Le domaine doit être servi en HTTPS et répondre sur /manifest.json." >&2
     exit 1
 fi
