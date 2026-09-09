@@ -81,7 +81,16 @@ développement.
 
 Le téléphone et l'ordinateur doivent être sur le même Wi-Fi, et le pare-feu de
 l'ordinateur laisser entrer le port 8093 — c'est ce qui bloque le plus souvent
-sous Windows.
+sous Windows. Pour l'ouvrir, dans un PowerShell **administrateur** :
+
+```powershell
+New-NetFirewallRule -DisplayName 'Kelasi 8093' -Direction Inbound `
+    -LocalPort 8093 -Protocol TCP -Action Allow -Profile Private
+```
+
+Avant de soupçonner le réglage de Chrome, vérifier que la page s'ouvre tout
+court : si `http://192.168.1.20:8093` ne charge pas, le problème est le
+pare-feu ou l'adresse, pas l'origine sûre.
 
 Ce réglage ne vaut que pour ce navigateur et cette adresse : il sert à
 essayer, jamais à mettre en service.
@@ -115,9 +124,28 @@ Ensuite :
 2. accepter la demande d'autorisation de débogage qui s'affiche ;
 3. sur l'ordinateur, dans Chrome : `chrome://inspect/#devices`, cocher
    **Port forwarding**, ajouter `8093` → `localhost:8093` ;
-4. sur le téléphone, ouvrir `http://localhost:8093`.
+4. sur le téléphone, ouvrir Chrome, puis `http://localhost:8093`.
 
 L'invite d'installation apparaît comme elle le fera en production.
+
+**Si `chrome://inspect` affiche `Offline` et « Pending authentication ».** Le
+bandeau « Port forwarding is active » ne parle que de l'ordinateur : tant que
+le téléphone est `Offline`, rien ne lui parvient. L'autorisation n'a pas
+abouti, et elle ne se redemande pas d'elle-même :
+
+1. déverrouiller le téléphone et **le laisser déverrouillé** — la demande ne
+   s'affiche jamais sur un écran verrouillé ;
+2. *Options de développement › Révoquer les autorisations de débogage USB* ;
+3. fermer tout ce qui pourrait tenir le téléphone : Samsung Smart Switch,
+   Android Studio, un `adb.exe` lancé à la main (`adb kill-server`). Chrome
+   embarque son propre ADB et ne partage pas l'appareil ;
+4. débrancher, rebrancher, choisir **Transfert de fichiers** ;
+5. la demande « Autoriser le débogage USB ? » s'affiche : cocher *Toujours
+   autoriser depuis cet ordinateur*, puis **Autoriser**.
+
+La ligne de `chrome://inspect` doit alors porter le modèle du téléphone au
+lieu de `Offline`. Chrome doit être ouvert sur le téléphone pour que les
+onglets s'y listent.
 
 ### iPhone — avec le certificat de Caddy
 
