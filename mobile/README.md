@@ -63,7 +63,39 @@ tls /etc/caddy/kelasi.crt /etc/caddy/kelasi.key
 ## Essayer sur son téléphone, sans domaine
 
 Attendre une entrée DNS pour voir à quoi ressemble l'installation serait
-dommage. Trois chemins existent, tout de suite, sur le réseau local.
+dommage. Quatre chemins existent, tout de suite. Le premier ne dépend ni du
+réseau local ni du câble : c'est celui par lequel commencer si les autres
+résistent.
+
+### Par un tunnel — celui qui marche quand le réseau local résiste
+
+C'est le chemin le plus sûr, et le seul qui donne un **vrai** HTTPS sans
+domaine ni certificat à installer : un tunnel sortant publie l'application sur
+une adresse publique le temps de l'essai. Ni câble, ni pare-feu, ni Wi-Fi
+partagé — le téléphone peut même être en données mobiles.
+
+```sh
+# une seule commande, aucun compte à créer
+cloudflared tunnel --url http://localhost:8093
+```
+
+`cloudflared` s'installe en un paquet (`winget install Cloudflare.cloudflared`
+sous Windows, `brew install cloudflared` sous macOS). Il affiche une adresse
+en `https://xxx-yyy-zzz.trycloudflare.com` : c'est elle qu'on ouvre sur le
+téléphone.
+
+Il reste à le dire à l'application, sans quoi elle fabriquera ses adresses en
+`http://localhost` :
+
+```sh
+# .env
+APP_URL=https://xxx-yyy-zzz.trycloudflare.com
+docker compose restart app
+```
+
+Comme l'adresse change à chaque lancement du tunnel, ce chemin sert à essayer,
+jamais à mettre en service. Mais tout y fonctionne pour de bon : service
+worker, installation, notifications poussées.
 
 ### Android, par un réglage de Chrome — le plus rapide
 
