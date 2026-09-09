@@ -63,28 +63,67 @@ tls /etc/caddy/kelasi.crt /etc/caddy/kelasi.key
 ## Essayer sur son téléphone, sans domaine
 
 Attendre une entrée DNS pour voir à quoi ressemble l'installation serait
-dommage. Deux chemins existent, tout de suite, sur le réseau local.
+dommage. Trois chemins existent, tout de suite, sur le réseau local.
 
-### Android, par le câble — cinq minutes, rien à installer
+### Android, par un réglage de Chrome — le plus rapide
 
-Chrome sait faire passer un port du téléphone vers l'ordinateur. Comme le
-téléphone voit alors l'application sur `localhost`, qui est toujours considéré
-comme une origine sûre, **tout fonctionne sans le moindre certificat** :
-service worker, installation, mode hors ligne.
+Chrome sait tenir une origine pour sûre alors qu'elle est en clair. C'est
+prévu exactement pour cet usage : ni câble, ni certificat, ni options de
+développement.
 
-1. sur le téléphone : *Paramètres › Options pour les développeurs › Débogage
-   USB* ;
-2. brancher le câble, accepter l'autorisation qui s'affiche ;
+1. sur l'ordinateur, relever son adresse sur le réseau local
+   (`ipconfig` sous Windows, `ip a` sous Linux) — par exemple `192.168.1.20` ;
+2. sur le téléphone, dans Chrome, ouvrir
+   `chrome://flags/#unsafely-treat-insecure-origin-as-secure` ;
+3. y inscrire `http://192.168.1.20:8093`, passer le réglage sur **Enabled**,
+   relancer Chrome quand il le propose ;
+4. ouvrir `http://192.168.1.20:8093`.
+
+Le téléphone et l'ordinateur doivent être sur le même Wi-Fi, et le pare-feu de
+l'ordinateur laisser entrer le port 8093 — c'est ce qui bloque le plus souvent
+sous Windows.
+
+Ce réglage ne vaut que pour ce navigateur et cette adresse : il sert à
+essayer, jamais à mettre en service.
+
+### Android, par le câble — fidèle à la production
+
+Chrome sait aussi faire passer un port du téléphone vers l'ordinateur. Le
+téléphone voit alors l'application sur `localhost`, que les navigateurs
+traitent toujours comme une origine sûre : **tout fonctionne sans le moindre
+certificat ni réglage particulier**.
+
+Il faut d'abord débloquer les options de développement, **masquées par défaut
+sur tous les Android** — c'est pourquoi on ne les trouve pas dans les
+Paramètres :
+
+1. *Paramètres › À propos du téléphone › Informations sur le logiciel* ;
+2. appuyer **sept fois** sur **Numéro de version** (« Build number ») ;
+3. saisir le code de l'écran de verrouillage. Un message confirme que le mode
+   développeur est activé ;
+4. *Options de développement* apparaît alors dans les Paramètres — chez
+   Samsung, tout en bas de la liste. Y activer **Débogage USB**.
+
+Si la formulation diffère d'une version à l'autre, le plus sûr est le champ de
+recherche en haut des Paramètres : y taper `numéro de version`, puis, une fois
+le mode activé, `débogage`.
+
+Ensuite :
+
+1. brancher le câble et, sur le téléphone, choisir le mode **Transfert de
+   fichiers** plutôt que « Recharge seule » ;
+2. accepter la demande d'autorisation de débogage qui s'affiche ;
 3. sur l'ordinateur, dans Chrome : `chrome://inspect/#devices`, cocher
    **Port forwarding**, ajouter `8093` → `localhost:8093` ;
 4. sur le téléphone, ouvrir `http://localhost:8093`.
 
 L'invite d'installation apparaît comme elle le fera en production.
 
-### Android et iPhone, par le Wi-Fi — avec le certificat de Caddy
+### iPhone — avec le certificat de Caddy
 
-Sans câble, il faut un certificat, et donc faire reconnaître au téléphone
-l'autorité que Caddy fabrique lui-même. Caddy s'en charge dès qu'on lui donne
+Safari n'a ni réglage d'origine sûre ni renvoi de port : sur iPhone, il faut un
+certificat, et donc faire reconnaître au téléphone l'autorité que Caddy
+fabrique lui-même. Le chemin vaut aussi pour Android. Caddy s'en charge dès qu'on lui donne
 une adresse IP plutôt qu'un domaine :
 
 ```sh
